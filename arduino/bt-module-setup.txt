@@ -4,4 +4,5 @@ upload `serial-echo` project to Arduino
 open `Serial Monitor` tool and set options to `Both NL & CR` and `9600 baud`
 to check connection send `AT` - it should response with `OK`
 to check current name send `AT+NAME`
-to set new name send `AT+NAME=cresson`
+to set new name send `AT+NAMEcresson`
+to apply change send `AT+RESET`
