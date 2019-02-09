@@ -2,11 +2,16 @@ import UIKit
 
 class ViewController: UIViewController {
 
+  var btConnection: BtConnection!
+
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
+    btConnection = BtConnection(self)
   }
-
-
 }
 
+extension ViewController: BtConnectionDelegate {
+  func status(_ status: String) {
+    print(status)
+  }
+}
