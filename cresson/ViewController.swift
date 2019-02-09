@@ -14,4 +14,8 @@ extension ViewController: BtConnectionDelegate {
   func status(_ status: String) {
     print(status)
   }
+
+  func data(_ data: BikeData) {
+    print(String(data: try! JSONEncoder().encode(data), encoding: .utf8)!)
+  }
 }

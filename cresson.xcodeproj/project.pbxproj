@@ -13,6 +13,7 @@
 		FA317246220E53460081DB6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA317245220E53460081DB6B /* Assets.xcassets */; };
 		FA317249220E53460081DB6B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317247220E53460081DB6B /* LaunchScreen.storyboard */; };
 		FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6837D9220E912F00A60BB4 /* BtConnection.swift */; };
+		FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* BikeData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		FA317248220E53460081DB6B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FA31724A220E53460081DB6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA6837D9220E912F00A60BB4 /* BtConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtConnection.swift; sourceTree = "<group>"; };
+		FAB8333B220F5C2D00BE63FB /* BikeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 			children = (
 				FA31723E220E53440081DB6B /* AppDelegate.swift */,
 				FA317240220E53440081DB6B /* ViewController.swift */,
+				FAB8333B220F5C2D00BE63FB /* BikeData.swift */,
 				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
 				FA317245220E53460081DB6B /* Assets.xcassets */,
@@ -140,6 +143,7 @@
 			files = (
 				FA317241220E53440081DB6B /* ViewController.swift in Sources */,
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
+				FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
