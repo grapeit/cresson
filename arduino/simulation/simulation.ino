@@ -25,7 +25,7 @@ void loop() {
 }
 
 void sendData() {
-  int s = sprintf(sz, "{\"status\":\"%s\",\"registers\":{", "connected");
+  int s = sprintf(sz, "{\"status\":\"%s\",\"registers\":[", "connected");
   bool first = true;
   int idx = 0;
   for (long& i : registers) {
@@ -34,10 +34,10 @@ void sendData() {
     } else {
       first = false;
     }
-    i += random(-10, 10);
-    s += sprintf(sz + s, "\"%d\":%ld", idx++, i);
+    i += random(-10, 11);
+    s += sprintf(sz + s, "{\"i\":%d,\"v\":%ld}", idx++, i);
   }
-  sz[s++] = '}';
+  sz[s++] = ']';
   s += sprintf(sz + s, ",\"time\":%ld", millis() - reportTime);
   sz[s++] = '}';
   sz[s] = 0;

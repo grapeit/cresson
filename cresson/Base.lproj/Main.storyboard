@@ -24,16 +24,25 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="8Ox-7H-Zgc">
+                                <rect key="frame" x="16" y="20" width="343" height="598"/>
+                                <color key="backgroundColor" red="0.91876435279846191" green="0.95213669538497925" blue="0.8317340612411499" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" red="0.91876435279846191" green="0.95213669538497925" blue="0.8317340612411499" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="8Ox-7H-Zgc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="4fx-LU-O1O"/>
+                            <constraint firstItem="8Ox-7H-Zgc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="C0u-Lw-sMU"/>
+                            <constraint firstItem="ecY-Oa-Ya7" firstAttribute="top" secondItem="8Ox-7H-Zgc" secondAttribute="bottom" constant="8" id="GvC-KU-WX8"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ecY-Oa-Ya7" secondAttribute="trailing" constant="16" id="Lkd-W0-EgD"/>
                             <constraint firstItem="ecY-Oa-Ya7" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="Taf-gX-B8y"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="8Ox-7H-Zgc" secondAttribute="trailing" constant="16" id="Wex-zu-cdj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="ecY-Oa-Ya7" secondAttribute="bottom" constant="20" id="hYr-LW-1C4"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="dataView" destination="8Ox-7H-Zgc" id="XIX-Lk-YXd"/>
                         <outlet property="statusLabel" destination="ecY-Oa-Ya7" id="wen-br-ntZ"/>
                     </connections>
                 </viewController>

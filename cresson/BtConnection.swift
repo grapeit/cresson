@@ -29,12 +29,12 @@ class BtConnection: NSObject {
   }
 
   private func onConnectionFailed(_ error: String) {
-    delegate.status("Connection failed: " + error)
+    delegate.status("connection failed: " + error)
     characteristic = nil
     peripheral = nil
     Timer.scheduledTimer(withTimeInterval: retryInterval, repeats: false) {_ in
       if (self.manager.state == CBManagerState.poweredOn) {
-        self.delegate.status("Searching for device")
+        self.delegate.status("searching for device")
         self.manager.scanForPeripherals(withServices: [self.serviceId], options: nil)
       }
     }
@@ -56,11 +56,11 @@ extension BtConnection: CBCentralManagerDelegate {
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
     if central.state == CBManagerState.poweredOn {
       central.scanForPeripherals(withServices: [serviceId], options: nil)
-      delegate.status("Searching for device")
+      delegate.status("searching for device")
     } else {
       self.characteristic = nil
       self.peripheral = nil
-      delegate.status("Bluetooth is not available")
+      delegate.status("bluetooth is not available")
     }
   }
 
@@ -70,22 +70,22 @@ extension BtConnection: CBCentralManagerDelegate {
       manager.stopScan()
       self.peripheral = peripheral
       self.peripheral.delegate = self
-      delegate.status("Connecting (stage 1 of 3)")
+      delegate.status("connecting (stage 1 of 3)")
       manager.connect(peripheral, options: nil)
     }
   }
 
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-    delegate.status("Connecting (stage 2 of 3)")
+    delegate.status("connecting (stage 2 of 3)")
     peripheral.discoverServices([serviceId])
   }
 
   func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-    onConnectionFailed("Failed to connect")
+    onConnectionFailed("failed to connect")
   }
 
   func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-    onConnectionFailed("Device disconnected")
+    onConnectionFailed("device disconnected")
   }
 }
 
@@ -95,11 +95,11 @@ extension BtConnection: CBPeripheralDelegate {
     for service in peripheral.services! {
       if service.uuid == serviceId {
         peripheral.discoverCharacteristics(nil, for: service)
-        delegate.status("Connecting (stage 3 of 3)")
+        delegate.status("connecting (stage 3 of 3)")
         return
       }
     }
-    onConnectionFailed("Requred service is not found")
+    onConnectionFailed("requred service is not found")
   }
 
   func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
@@ -107,11 +107,11 @@ extension BtConnection: CBPeripheralDelegate {
       if characteristic.uuid == characteristicId {
         self.characteristic = characteristic
         peripheral.setNotifyValue(true, for: characteristic)
-        delegate.status("Connected")
+        delegate.status("connected")
         return
       }
     }
-    onConnectionFailed("Required characteristic not found")
+    onConnectionFailed("required characteristic not found")
   }
 
   func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
