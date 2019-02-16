@@ -7,7 +7,8 @@ class ViewController: UIViewController {
 
   var btConnection: BtConnection!
   var bikeData: BikeData?
-  var viewCells = [Int: UITableViewCell]()
+  var viewCells = [UITableViewCell]()
+  var registerRows = [Int: Int]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -17,19 +18,23 @@ class ViewController: UIViewController {
     statusLabel.text = "Hello"
   }
 
+  func cellFor(register: Int) -> UITableViewCell {
+    if let r = registerRows[register] {
+      return viewCells[r]
+    }
+    let c = UITableViewCell()
+    c.backgroundColor = dataView.backgroundColor
+    registerRows[register] = viewCells.count
+    viewCells.append(c)
+    return c
+  }
+
   func updateCells() {
     guard let bikeData = bikeData else {
       return
     }
     for r in bikeData.registers {
-      if let c = viewCells[r.id] {
-        c.textLabel?.text = r.label()
-      } else {
-        let c = UITableViewCell()
-        c.backgroundColor = dataView.backgroundColor
-        c.textLabel?.text = r.label()
-        viewCells[r.id] = c
-      }
+      cellFor(register: r.id).textLabel?.text = r.label()
     }
   }
 }
@@ -48,7 +53,7 @@ extension ViewController: BtConnectionDelegate {
     if reload {
       dataView.reloadData()
     }
-    statusLabel.text = bikeData?.status
+    statusLabel.text = bikeData?.statusLabel()
   }
 }
 
@@ -60,6 +65,6 @@ extension ViewController: UITableViewDelegate {
 
 extension ViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    return viewCells[indexPath.row]!
+    return viewCells[indexPath.row]
   }
 }

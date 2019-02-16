@@ -12,11 +12,16 @@ class BikeData: Decodable, Encodable {
     }
 
     func label() -> String {
-      return "\(id): \(value)"
+      return String(format: "%02d: %08X (%d)", id, value, value)
     }
   }
 
   let status: String
-  let time: TimeInterval
   let registers: [Register]
+  let lastError: Int
+  let time: TimeInterval
+
+  func statusLabel() -> String {
+    return String(format: "%@ (e: %d, t: %.0f)", status, lastError, time)
+  }
 }
