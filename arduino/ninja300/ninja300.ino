@@ -14,7 +14,31 @@ struct Register
 };
 
 char currentStatus[32] { };
-Register registers[] = { {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12} };
+Register registers[] = {
+    {4},  // Throttle Position Sensor 0x00D2 - 0x037A (depends on kill switch)
+//    {5},  // Air Pressure
+    {6},  // Engine Coolant Temperature = (a - 48) / 1.6 (in C)
+//    {7},  // Intake Air Temperature
+//    {8},  // ?
+    {9},  // Engine RPM = (a * 100) + b
+    {10}, // Battery
+    {11}, // Gear Position = x
+    {12}  // Speed
+};
+
+unsigned long cycle;
+bool shouldRequest(uint8_t id) {
+  if (!id) {
+    return true;
+  }
+  if (id == 6) {
+    return cycle % 2 != 0;
+  }
+  if (id == 10) {
+    return cycle % 2 == 0;
+  }
+  return true;
+}
 
 unsigned long reportTime;
 char sz[512];
@@ -43,6 +67,7 @@ void connectToBike() {
   sendData();
   delay(1000);
   if (kawa.initPulse()) {
+    cycle = 0;
     strcpy(currentStatus, "bike is connected");
   } else {
     strcpy(currentStatus, "handshake failed");
@@ -53,7 +78,11 @@ void connectToBike() {
 void requestRegisters() {
   led.set(RgbLed::green);
   uint8_t response[sizeof (Register::value)];
+  ++cycle;
   for (auto& r : registers) {
+    if (!shouldRequest(r.id)) {
+      continue;
+    }
     uint8_t l = kawa.requestRegister(r.id, response, sizeof response);
     if (kawa.getLastError() != 0) {
       break;
