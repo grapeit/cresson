@@ -14,6 +14,8 @@
 		FA317249220E53460081DB6B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317247220E53460081DB6B /* LaunchScreen.storyboard */; };
 		FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6837D9220E912F00A60BB4 /* BtConnection.swift */; };
 		FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* BikeData.swift */; };
+		FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */; };
+		FADEE41D221BA73F0046CB4B /* RegisterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		FA31724A220E53460081DB6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA6837D9220E912F00A60BB4 /* BtConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtConnection.swift; sourceTree = "<group>"; };
 		FAB8333B220F5C2D00BE63FB /* BikeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeData.swift; sourceTree = "<group>"; };
+		FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewCell.swift; sourceTree = "<group>"; };
+		FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegisterTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,8 @@
 				FAB8333B220F5C2D00BE63FB /* BikeData.swift */,
 				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
+				FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */,
+				FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */,
 				FA317245220E53460081DB6B /* Assets.xcassets */,
 				FA317247220E53460081DB6B /* LaunchScreen.storyboard */,
 				FA31724A220E53460081DB6B /* Info.plist */,
@@ -130,6 +136,7 @@
 			files = (
 				FA317249220E53460081DB6B /* LaunchScreen.storyboard in Resources */,
 				FA317246220E53460081DB6B /* Assets.xcassets in Resources */,
+				FADEE41D221BA73F0046CB4B /* RegisterTableViewCell.xib in Resources */,
 				FA317244220E53440081DB6B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -143,6 +150,7 @@
 			files = (
 				FA317241220E53440081DB6B /* ViewController.swift in Sources */,
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
+				FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */,
 				FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
 			);

@@ -4,7 +4,7 @@ import CoreBluetooth
 
 protocol BtConnectionDelegate {
   func status(_ status: String)
-  func data(_ data: BikeData)
+  func update(_ data: BikeUpdate)
 }
 
 
@@ -44,8 +44,8 @@ class BtConnection: NSObject {
     dataCollected += data
     //let s = String(data: dataCollected, encoding: .utf8);
     while let n = dataCollected.index(of: UInt8(0x0A)) { // 0x0A = `\n`
-      if let j = try? JSONDecoder().decode(BikeData.self, from: dataCollected[..<n]) {
-        delegate.data(j)
+      if let j = try? JSONDecoder().decode(BikeUpdate.self, from: dataCollected[..<n]) {
+        delegate.update(j)
       }
       dataCollected = dataCollected[dataCollected.index(n, offsetBy: 1)...]
     }
