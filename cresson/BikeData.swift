@@ -52,7 +52,7 @@ class BikeData {
       }
     }
     registers.sort { return $0.id < $1.id }
-    status = String(format: "%@ (e: %d, t: %.0f)", data.status, data.lastError, data.time)
+    status = String(format: "%@ (time: %.0lfms)", data.status, data.time)
     return reload
   }
 }
@@ -80,7 +80,7 @@ extension BikeData.Register {
 
   func throttleLabel() -> String {
     let v = Double(value - 0x00D2) / Double(0x037A - 0x00D2) * 100.0
-    return String(format: "Throttle: %.0lf%% (%08X)", min(100.0, max(0.0, v)), value)
+    return String(format: "Throttle: %.0lf%%", min(100.0, max(0.0, v)))
   }
 
   func coolantLabel() -> String {
