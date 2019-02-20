@@ -21,9 +21,9 @@ Register registers[] = {
 //    {7},  // Intake Air Temperature
 //    {8},  // ?
     {9},  // Engine RPM = (a * 100) + b
-    {10}, // Battery
-    {11}, // Gear Position = x
-    {12}  // Speed
+    {10}, // Battery (V) = a / 12.75
+    {11}, // Gear Position = a
+    {12}  // Speed (km/h) = (a * 100) + b
 };
 
 unsigned long cycle;
