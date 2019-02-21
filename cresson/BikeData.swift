@@ -30,6 +30,17 @@ class BikeData {
   var registers = [Register]()
   var status = String()
 
+  func testData() {
+    status = "testing"
+    let t = Date().timeIntervalSinceReferenceDate
+    registers.append(Register(id: 1, value: 100, timestamp: t))
+    registers.append(Register(id: 2, value: 200, timestamp: t))
+    registers.append(Register(id: 3, value: 300, timestamp: t))
+    registers.append(Register(id: 4, value: 400, timestamp: t))
+    registers.append(Register(id: 5, value: 500, timestamp: t))
+    registers.append(Register(id: 6, value: 600, timestamp: t))
+  }
+
   func getRegister(_ id: Int) -> Register? {
     return registers.first() { $0.id == id } ?? nil
   }

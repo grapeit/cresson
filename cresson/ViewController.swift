@@ -10,6 +10,7 @@ class ViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    //bikeData.testData()
     btConnection = BtConnection(self)
     dataView.register(UINib(nibName: "RegisterTableViewCell", bundle: nil), forCellReuseIdentifier: "RegisterTableViewCell")
     dataView.delegate = self
