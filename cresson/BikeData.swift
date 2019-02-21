@@ -85,7 +85,7 @@ extension BikeData.Register {
 
   func coolantLabel() -> String {
     let c = Double(value - 48) / 1.6
-    return String(format: "Coolant: %.1lfC | %.1lfF", c, (c * 9.0 / 5.0) + 32.0)
+    return String(format: "Coolant: %.0lf°C | %.0lf°F", c, (c * 9.0 / 5.0) + 32.0)
   }
 
   func rpmLabel() -> String {
@@ -97,11 +97,11 @@ extension BikeData.Register {
   }
 
   func gearLabel() -> String {
-    return String(format: "Gear: %d", value)
+    return "Gear: " + (value == 0 ? "N" : "\(value)")
   }
 
   func speedLabel() -> String {
-    let km = ((value & 0xFF00) >> 8) * 100 + (value & 0xFF)
-    return String(format: "Speed: %dkm/h | %.0lfmph", km, Double(km) * 1.609344)
+    let kmh = Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0
+    return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, kmh / 1.609344)
   }
 }

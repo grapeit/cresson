@@ -17,13 +17,13 @@ char currentStatus[32] { };
 Register registers[] = {
     {4},  // Throttle Position Sensor 0x00D2 - 0x037A (depends on kill switch)
 //    {5},  // Air Pressure
-    {6},  // Engine Coolant Temperature = (a - 48) / 1.6 (in C)
+    {6},  // Engine Coolant Temperature (C) = (a - 48) / 1.6
 //    {7},  // Intake Air Temperature
 //    {8},  // ?
     {9},  // Engine RPM = (a * 100) + b
     {10}, // Battery (V) = a / 12.75
-    {11}, // Gear Position = a
-    {12}  // Speed (km/h) = (a * 100) + b
+    {11}, // Gear Position = a (always 0 or 6 when not running)
+    {12}  // Speed (km/h) = ((a * 100) + b) / 2
 };
 
 unsigned long cycle;
