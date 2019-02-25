@@ -21,6 +21,18 @@ class BikeUpdate: Decodable, Encodable {
 
 class BikeData {
 
+  enum Registers: Int {
+    case throttle = 4
+    case coolant = 6
+    case rpm = 9
+    case battery = 10
+    case gear = 11
+    case speed = 12
+
+    // calculated values
+    case odometer = 1000
+  }
+
   struct Register {
     let id: Int
     let value: Int
@@ -29,16 +41,11 @@ class BikeData {
 
   var registers = [Register]()
   var status = String()
+  var time: TimeInterval
 
-  func testData() {
-    status = "testing"
-    let t = Date().timeIntervalSinceReferenceDate
-    registers.append(Register(id: 1, value: 100, timestamp: t))
-    registers.append(Register(id: 2, value: 200, timestamp: t))
-    registers.append(Register(id: 3, value: 300, timestamp: t))
-    registers.append(Register(id: 4, value: 400, timestamp: t))
-    registers.append(Register(id: 5, value: 500, timestamp: t))
-    registers.append(Register(id: 6, value: 600, timestamp: t))
+
+  init() {
+    time = Date().timeIntervalSinceReferenceDate
   }
 
   func getRegister(_ id: Int) -> Register? {
@@ -46,46 +53,71 @@ class BikeData {
   }
 
   func update(_ data: BikeUpdate) -> Bool {
+    status = String(format: "%@ (time: %.0lf/%.0lfms)", data.status, data.time, (Date().timeIntervalSinceReferenceDate - time) * 1000.0)
+    time = Date().timeIntervalSinceReferenceDate
     var reload = false
     for r in data.registers {
-      let newRegister = Register(id: r.id, value: r.value, timestamp: Date().timeIntervalSinceReferenceDate)
-      var found = false
-      for (i, v) in registers.enumerated() {
-        if v.id == r.id {
-          registers[i] = newRegister
-          found = true
-          break
+      let newRegister = Register(id: r.id, value: r.value, timestamp: time)
+      if r.id == Registers.speed.rawValue {
+        if updateOdometer(currentSpeed: newRegister) {
+          reload = true
         }
       }
-      if !found {
-        registers.append(newRegister)
+      if setRegister(newRegister) {
         reload = true
       }
     }
-    registers.sort { return $0.id < $1.id }
-    status = String(format: "%@ (time: %.0lfms)", data.status, data.time)
+    if reload {
+      registers.sort { return $0.id < $1.id }
+    }
     return reload
+  }
+
+  private func setRegister(_ register: Register) -> Bool {
+    for (i, v) in registers.enumerated() {
+      if v.id == register.id {
+        registers[i] = register
+        return false
+      }
+    }
+    registers.append(register)
+    return true
+  }
+
+  private func updateOdometer(currentSpeed: Register) -> Bool {
+    guard let oldSpeed = getRegister(Registers.speed.rawValue) else {
+      return false
+    }
+    let time = currentSpeed.timestamp - oldSpeed.timestamp
+    let speedKmh = Double(oldSpeed.speedValueKmh2() + currentSpeed.speedValueKmh2()) / 2.0 / 2.0
+    let speedMs = speedKmh / 3.6
+    let distanceMm = Int((speedMs * time * 1000.0).rounded())
+    let odo = getRegister(Registers.odometer.rawValue)?.value ?? 0
+    return setRegister(Register(id: Registers.odometer.rawValue, value: odo + distanceMm, timestamp: currentSpeed.timestamp))
   }
 }
 
 
 extension BikeData.Register {
   func label() -> String {
-    switch id {
-    case 4:
-      return throttleLabel()
-    case 6:
-      return coolantLabel()
-    case 9:
-      return rpmLabel()
-    case 10:
-      return batteryLabel()
-    case 11:
-      return gearLabel()
-    case 12:
-      return speedLabel()
-    default:
+    guard let r = BikeData.Registers(rawValue: id) else {
       return String(format: "%02d: %08X (%d)", id, value, value)
+    }
+    switch r {
+    case .throttle:
+      return throttleLabel()
+    case .coolant:
+      return coolantLabel()
+    case .rpm:
+      return rpmLabel()
+    case .battery:
+      return batteryLabel()
+    case .gear:
+      return gearLabel()
+    case .speed:
+      return speedLabel()
+    case .odometer:
+      return odometerLabel()
     }
   }
 
@@ -112,7 +144,16 @@ extension BikeData.Register {
   }
 
   func speedLabel() -> String {
-    let kmh = Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0
+    let kmh = Double(speedValueKmh2()) / 2.0
     return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, kmh / 1.609344)
+  }
+
+  func odometerLabel() -> String {
+    let km = Double(value) / 1000000.0
+    return String(format: "Odo: %.2lfkm | %.2lfmi", km, km / 1.609344)
+  }
+
+  func speedValueKmh2() -> Int {
+    return ((value & 0xFF00) >> 8) * 100 + (value & 0xFF)
   }
 }
