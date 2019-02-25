@@ -3,7 +3,7 @@ import UIKit
 class RegisterTableViewCell: UITableViewCell {
 
   @IBOutlet weak var label: UILabel!
-  var registerId = 0
+  var registerId: BikeData.RegisterId?
 
   override func awakeFromNib() {
       super.awakeFromNib()

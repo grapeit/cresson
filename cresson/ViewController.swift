@@ -31,7 +31,7 @@ extension ViewController: BtConnectionDelegate {
       dataView.reloadData()
     } else {
       for c in dataView.visibleCells {
-        if let c = c as? RegisterTableViewCell, let r = bikeData.getRegister(c.registerId) {
+        if let c = c as? RegisterTableViewCell, let id = c.registerId, let r = bikeData.getRegister(id) {
           c.setRegister(r)
         }
       }

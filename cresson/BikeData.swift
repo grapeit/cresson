@@ -21,7 +21,7 @@ class BikeUpdate: Decodable, Encodable {
 
 class BikeData {
 
-  enum Registers: Int {
+  enum RegisterId: Int {
     case throttle = 4
     case coolant = 6
     case rpm = 9
@@ -34,7 +34,7 @@ class BikeData {
   }
 
   struct Register {
-    let id: Int
+    let id: RegisterId
     let value: Int
     let timestamp: TimeInterval
   }
@@ -48,7 +48,7 @@ class BikeData {
     time = Date().timeIntervalSinceReferenceDate
   }
 
-  func getRegister(_ id: Int) -> Register? {
+  func getRegister(_ id: RegisterId) -> Register? {
     return registers.first() { $0.id == id } ?? nil
   }
 
@@ -57,18 +57,17 @@ class BikeData {
     time = Date().timeIntervalSinceReferenceDate
     var reload = false
     for r in data.registers {
-      let newRegister = Register(id: r.id, value: r.value, timestamp: time)
-      if r.id == Registers.speed.rawValue {
-        if updateOdometer(currentSpeed: newRegister) {
-          reload = true
-        }
+      guard let id = RegisterId(rawValue: r.id) else {
+        continue
       }
-      if setRegister(newRegister) {
-        reload = true
+      let newRegister = Register(id: id, value: r.value, timestamp: time)
+      if id == .speed {
+        reload = updateOdometer(currentSpeed: newRegister) || reload
       }
+      reload = setRegister(newRegister) || reload
     }
     if reload {
-      registers.sort { return $0.id < $1.id }
+      registers.sort { return $0.id.rawValue < $1.id.rawValue }
     }
     return reload
   }
@@ -85,25 +84,22 @@ class BikeData {
   }
 
   private func updateOdometer(currentSpeed: Register) -> Bool {
-    guard let oldSpeed = getRegister(Registers.speed.rawValue) else {
+    guard let oldSpeed = getRegister(.speed) else {
       return false
     }
     let time = currentSpeed.timestamp - oldSpeed.timestamp
     let speedKmh = Double(oldSpeed.speedValueKmh2() + currentSpeed.speedValueKmh2()) / 2.0 / 2.0
     let speedMs = speedKmh / 3.6
     let distanceMm = Int((speedMs * time * 1000.0).rounded())
-    let odo = getRegister(Registers.odometer.rawValue)?.value ?? 0
-    return setRegister(Register(id: Registers.odometer.rawValue, value: odo + distanceMm, timestamp: currentSpeed.timestamp))
+    let odo = getRegister(.odometer)?.value ?? 0
+    return setRegister(Register(id: .odometer, value: odo + distanceMm, timestamp: currentSpeed.timestamp))
   }
 }
 
 
 extension BikeData.Register {
   func label() -> String {
-    guard let r = BikeData.Registers(rawValue: id) else {
-      return String(format: "%02d: %08X (%d)", id, value, value)
-    }
-    switch r {
+    switch id {
     case .throttle:
       return throttleLabel()
     case .coolant:
