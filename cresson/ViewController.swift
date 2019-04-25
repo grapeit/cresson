@@ -1,5 +1,8 @@
 import UIKit
 
+let registerSaveInterval = 5.0
+
+
 class ViewController: UIViewController {
 
   @IBOutlet weak var dataView: UITableView!
@@ -7,6 +10,8 @@ class ViewController: UIViewController {
 
   var btConnection: BtConnection!
   let bikeData = BikeData()
+  var saveTimer: Timer!
+
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -15,6 +20,11 @@ class ViewController: UIViewController {
     dataView.delegate = self
     dataView.dataSource = self
     statusLabel.text = ""
+    saveTimer = Timer.scheduledTimer(withTimeInterval: registerSaveInterval, repeats: true) { _ in self.bikeData.save() }
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    bikeData.save()
   }
 }
 
@@ -43,6 +53,25 @@ extension ViewController: BtConnectionDelegate {
 extension ViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return bikeData.registers.count
+  }
+
+  func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    let id = bikeData.registers[indexPath.row].id
+    if id == .trip {
+      return UISwipeActionsConfiguration(actions: [reset(register: id, at: indexPath)])
+    }
+    return UISwipeActionsConfiguration(actions: [])
+  }
+
+  private func reset(register: BikeData.RegisterId, at indexPath: IndexPath) -> UIContextualAction {
+    let action = UIContextualAction(style: .normal, title: "Reset") { (action, view, completion) in
+      self.bikeData.resetRegister(register)
+      self.bikeData.save()
+      self.dataView.reloadRows(at: [indexPath], with: .none)
+      completion(true)
+    }
+    action.backgroundColor = .red
+    return action
   }
 }
 

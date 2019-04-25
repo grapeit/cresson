@@ -31,6 +31,7 @@ class BikeData {
 
     // calculated values
     case odometer = 1000
+    case trip = 1001
   }
 
   struct Register {
@@ -46,6 +47,13 @@ class BikeData {
 
   init() {
     time = Date().timeIntervalSinceReferenceDate
+    loadRegister(.odometer)
+    loadRegister(.trip)
+  }
+
+  func save() {
+    saveRegister(.odometer)
+    saveRegister(.trip)
   }
 
   func getRegister(_ id: RegisterId) -> Register? {
@@ -72,7 +80,11 @@ class BikeData {
     return reload
   }
 
-  private func setRegister(_ register: Register) -> Bool {
+  func resetRegister(_ id: RegisterId) {
+    setRegister(Register(id: id, value: 0, timestamp: Date().timeIntervalSinceReferenceDate))
+  }
+
+  @discardableResult private func setRegister(_ register: Register) -> Bool {
     for (i, v) in registers.enumerated() {
       if v.id == register.id {
         registers[i] = register
@@ -83,6 +95,17 @@ class BikeData {
     return true
   }
 
+  private func loadRegister(_ id: RegisterId) {
+    let v = UserDefaults.standard.value(forKey: String(reflecting: id)) as? Int ?? 0
+    setRegister(Register(id: id, value: v, timestamp: Date().timeIntervalSinceReferenceDate))
+  }
+
+  private func saveRegister(_ id: RegisterId) {
+    if let v = getRegister(id)?.value {
+      UserDefaults.standard.set(v, forKey: String(reflecting: id))
+    }
+  }
+
   private func updateOdometer(currentSpeed: Register) -> Bool {
     guard let oldSpeed = getRegister(.speed) else {
       return false
@@ -91,11 +114,20 @@ class BikeData {
     let speedKmh = Double(oldSpeed.speedValueKmh2() + currentSpeed.speedValueKmh2()) / 2.0 / 2.0
     let speedMs = speedKmh / 3.6
     let distanceMm = Int((speedMs * time * 1000.0).rounded())
-    let odo = getRegister(.odometer)?.value ?? 0
-    return setRegister(Register(id: .odometer, value: odo + distanceMm, timestamp: currentSpeed.timestamp))
+    let add = { (r: RegisterId) -> Bool in
+      let v = self.getRegister(r)?.value ?? 0
+      return self.setRegister(Register(id: r, value: v + distanceMm, timestamp: currentSpeed.timestamp))
+    }
+    let co = add(.odometer)
+    let ct = add(.trip)
+    return co || ct
   }
 }
 
+
+private func km2mi(_ km: Double) -> Double {
+  return km / 1.609344
+}
 
 extension BikeData.Register {
   func label() -> String {
@@ -114,6 +146,8 @@ extension BikeData.Register {
       return speedLabel()
     case .odometer:
       return odometerLabel()
+    case .trip:
+      return tripLabel()
     }
   }
 
@@ -141,12 +175,17 @@ extension BikeData.Register {
 
   func speedLabel() -> String {
     let kmh = Double(speedValueKmh2()) / 2.0
-    return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, kmh / 1.609344)
+    return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, km2mi(kmh))
   }
 
   func odometerLabel() -> String {
     let km = Double(value) / 1000000.0
-    return String(format: "Odo: %.2lfkm | %.2lfmi", km, km / 1.609344)
+    return String(format: "Odo: %.0lfkm | %.0lfmi", km, km2mi(km))
+  }
+
+  func tripLabel() -> String {
+    let km = Double(value) / 1000000.0
+    return String(format: "Trip: %.2lfkm | %.2lfmi", km, km2mi(km))
   }
 
   func speedValueKmh2() -> Int {
