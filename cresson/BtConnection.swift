@@ -43,7 +43,7 @@ class BtConnection: NSObject {
   private func dataIn(_ data: Data) {
     dataCollected += data
     //let s = String(data: dataCollected, encoding: .utf8);
-    while let n = dataCollected.index(of: UInt8(0x0A)) { // 0x0A = `\n`
+    while let n = dataCollected.firstIndex(of: UInt8(0x0A)) { // 0x0A = `\n`
       if let j = try? JSONDecoder().decode(BikeUpdate.self, from: dataCollected[..<n]) {
         delegate.update(j)
       }
