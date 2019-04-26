@@ -1,6 +1,6 @@
 import UIKit
 
-let registerSaveInterval = 5.0
+let registerSaveInterval = 20.0
 
 
 class ViewController: UIViewController {
@@ -21,10 +21,8 @@ class ViewController: UIViewController {
     dataView.dataSource = self
     statusLabel.text = ""
     saveTimer = Timer.scheduledTimer(withTimeInterval: registerSaveInterval, repeats: true) { _ in self.bikeData.save() }
-  }
-
-  override func viewWillDisappear(_ animated: Bool) {
-    bikeData.save()
+    NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
+    NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
   }
 }
 
