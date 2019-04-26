@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA012585227299D8004A648F /* Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA012584227299D8004A648F /* Conversion.swift */; };
 		FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA31723E220E53440081DB6B /* AppDelegate.swift */; };
 		FA317241220E53440081DB6B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA317240220E53440081DB6B /* ViewController.swift */; };
 		FA317244220E53440081DB6B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317242220E53440081DB6B /* Main.storyboard */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FA012584227299D8004A648F /* Conversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversion.swift; sourceTree = "<group>"; };
 		FA31723B220E53440081DB6B /* cresson.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cresson.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA31723E220E53440081DB6B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA317240220E53440081DB6B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 				FA317240220E53440081DB6B /* ViewController.swift */,
 				FAB8333B220F5C2D00BE63FB /* BikeData.swift */,
 				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
+				FA012584227299D8004A648F /* Conversion.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
 				FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */,
 				FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */,
@@ -152,6 +155,7 @@
 				FA317241220E53440081DB6B /* ViewController.swift in Sources */,
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
 				FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */,
+				FA012585227299D8004A648F /* Conversion.swift in Sources */,
 				FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
 			);

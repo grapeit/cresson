@@ -111,9 +111,8 @@ class BikeData {
       return false
     }
     let time = currentSpeed.timestamp - oldSpeed.timestamp
-    let speedKmh = Double(oldSpeed.speedValueKmh2() + currentSpeed.speedValueKmh2()) / 2.0 / 2.0
-    let speedMs = speedKmh / 3.6
-    let distanceMm = Int((speedMs * time * 1000.0).rounded())
+    let speedMs = ((oldSpeed.speedValueKmh() + currentSpeed.speedValueKmh()) / 2.0).kmh2ms()
+    let distanceMm = Int((speedMs * time).m2mm().rounded())
     let add = { (r: RegisterId) -> Bool in
       let v = self.getRegister(r)?.value ?? 0
       return self.setRegister(Register(id: r, value: v + distanceMm, timestamp: currentSpeed.timestamp))
@@ -124,10 +123,6 @@ class BikeData {
   }
 }
 
-
-private func km2mi(_ km: Double) -> Double {
-  return km / 1.609344
-}
 
 extension BikeData.Register {
   func label() -> String {
@@ -158,7 +153,7 @@ extension BikeData.Register {
 
   func coolantLabel() -> String {
     let c = Double(value - 48) / 1.6
-    return String(format: "Coolant: %.0lf°C | %.0lf°F", c, (c * 9.0 / 5.0) + 32.0)
+    return String(format: "Coolant: %.0lf°C | %.0lf°F", c, c.c2f())
   }
 
   func rpmLabel() -> String {
@@ -174,21 +169,21 @@ extension BikeData.Register {
   }
 
   func speedLabel() -> String {
-    let kmh = Double(speedValueKmh2()) / 2.0
-    return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, km2mi(kmh))
+    let kmh = speedValueKmh()
+    return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, kmh.km2mi())
   }
 
   func odometerLabel() -> String {
-    let km = Double(value) / 1000000.0
-    return String(format: "Odo: %.0lfkm | %.0lfmi", km, km2mi(km))
+    let km = Double(value).mm2km()
+    return String(format: "Odo: %.0lfkm | %.0lfmi", km, km.km2mi())
   }
 
   func tripLabel() -> String {
-    let km = Double(value) / 1000000.0
-    return String(format: "Trip: %.2lfkm | %.2lfmi", km, km2mi(km))
+    let km = Double(value).mm2km()
+    return String(format: "Trip: %.2lfkm | %.2lfmi", km, km.km2mi())
   }
 
-  func speedValueKmh2() -> Int {
-    return ((value & 0xFF00) >> 8) * 100 + (value & 0xFF)
+  func speedValueKmh() -> Double {
+    return Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0
   }
 }
