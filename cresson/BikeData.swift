@@ -32,6 +32,10 @@ class BikeData {
     // calculated values
     case odometer = 1000
     case trip = 1001
+
+    func isLive() -> Bool {
+      return self.rawValue < 1000
+    }
   }
 
   struct Register {

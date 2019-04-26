@@ -15,8 +15,9 @@ class RegisterTableViewCell: UITableViewCell {
       // Configure the view for the selected state
   }
 
-  func setRegister(_ register: BikeData.Register) {
+  func setRegister(_ register: BikeData.Register, connected: Bool) {
     registerId = register.id
     label.text = register.label()
+    label.textColor = (!connected && register.id.isLive()) ? .lightGray : .black
   }
 }

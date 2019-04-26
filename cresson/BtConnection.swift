@@ -20,6 +20,8 @@ class BtConnection: NSObject {
 
   private var dataCollected = Data()
 
+  private(set) var connected = false
+
   let delegate: BtConnectionDelegate
 
   init(_ delegate: BtConnectionDelegate) {
@@ -29,6 +31,7 @@ class BtConnection: NSObject {
   }
 
   private func onConnectionFailed(_ error: String) {
+    connected = false
     delegate.status("connection failed: " + error)
     characteristic = nil
     peripheral = nil
@@ -108,6 +111,7 @@ extension BtConnection: CBPeripheralDelegate {
       if characteristic.uuid == characteristicId {
         self.characteristic = characteristic
         peripheral.setNotifyValue(true, for: characteristic)
+        connected = true
         delegate.status("connected")
         return
       }

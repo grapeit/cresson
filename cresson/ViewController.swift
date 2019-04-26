@@ -11,6 +11,7 @@ class ViewController: UIViewController {
   var btConnection: BtConnection!
   let bikeData = BikeData()
   var saveTimer: Timer!
+  var connected = false
 
 
   override func viewDidLoad() {
@@ -29,6 +30,10 @@ class ViewController: UIViewController {
 extension ViewController: BtConnectionDelegate {
   func status(_ status: String) {
     print(status)
+    if connected != btConnection.connected {
+      connected = btConnection.connected
+      dataView.reloadData()
+    }
     statusLabel.text = status
   }
 
@@ -40,7 +45,7 @@ extension ViewController: BtConnectionDelegate {
     } else {
       for c in dataView.visibleCells {
         if let c = c as? RegisterTableViewCell, let id = c.registerId, let r = bikeData.getRegister(id) {
-          c.setRegister(r)
+          c.setRegister(r, connected: connected)
         }
       }
     }
@@ -77,7 +82,7 @@ extension ViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = dataView.dequeueReusableCell(withIdentifier: "RegisterTableViewCell", for: indexPath)
     if let cell = cell as? RegisterTableViewCell {
-      cell.setRegister(bikeData.registers[indexPath.row])
+      cell.setRegister(bikeData.registers[indexPath.row], connected: connected)
     }
     return cell
   }
