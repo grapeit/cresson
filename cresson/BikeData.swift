@@ -21,7 +21,7 @@ class BikeUpdate: Decodable, Encodable {
 
 class BikeData {
 
-  enum RegisterId: Int {
+  enum RegisterId: Int, CaseIterable {
     case throttle = 4
     case coolant = 6
     case rpm = 9
@@ -29,12 +29,13 @@ class BikeData {
     case gear = 11
     case speed = 12
 
-    // calculated values
-    case odometer = 1000
-    case trip = 1001
+    // client values
+    case odometer = -1
+    case trip = -2
+    case map = -3
 
-    func isLive() -> Bool {
-      return self.rawValue < 1000
+    func isClient() -> Bool {
+      return self.rawValue < 0
     }
   }
 
@@ -47,17 +48,26 @@ class BikeData {
   var registers = [Register]()
   var status = String()
   var time: TimeInterval
+  var btConnection: BtConnection?
 
 
   init() {
     time = Date().timeIntervalSinceReferenceDate
-    loadRegister(.odometer)
-    loadRegister(.trip)
+    for id in RegisterId.allCases {
+      if id.isClient() {
+        loadRegister(id)
+      } else {
+        setRegister(Register(id: id, value: 0, timestamp: time))
+      }
+    }
   }
 
   func save() {
-    saveRegister(.odometer)
-    saveRegister(.trip)
+    for r in registers {
+      if r.id.isClient() {
+        saveRegister(r)
+      }
+    }
   }
 
   func getRegister(_ id: RegisterId) -> Register? {
@@ -78,9 +88,6 @@ class BikeData {
       }
       reload = setRegister(newRegister) || reload
     }
-    if reload {
-      registers.sort { return $0.id.rawValue < $1.id.rawValue }
-    }
     return reload
   }
 
@@ -88,15 +95,32 @@ class BikeData {
     setRegister(Register(id: id, value: 0, timestamp: Date().timeIntervalSinceReferenceDate))
   }
 
-  @discardableResult private func setRegister(_ register: Register) -> Bool {
+  @discardableResult func setRegister(_ register: Register) -> Bool {
+    var new = true
     for (i, v) in registers.enumerated() {
       if v.id == register.id {
         registers[i] = register
-        return false
+        new = false
+        break
       }
     }
-    registers.append(register)
-    return true
+    if new {
+      registers.append(register)
+    }
+    if register.id.isClient() {
+      if register.id == .map {
+        sendMap()
+      }
+      saveRegister(register)
+    }
+    return new
+  }
+
+  func sendMap() {
+    guard let btConnection = btConnection, let register = getRegister(.map) else {
+      return
+    }
+    btConnection.send(Data(bytes: [UInt8(register.value)], count: 1))
   }
 
   private func loadRegister(_ id: RegisterId) {
@@ -104,10 +128,8 @@ class BikeData {
     setRegister(Register(id: id, value: v, timestamp: Date().timeIntervalSinceReferenceDate))
   }
 
-  private func saveRegister(_ id: RegisterId) {
-    if let v = getRegister(id)?.value {
-      UserDefaults.standard.set(v, forKey: String(reflecting: id))
-    }
+  private func saveRegister(_ register: Register) {
+    UserDefaults.standard.set(register.value, forKey: String(reflecting: register.id))
   }
 
   private func updateOdometer(currentSpeed: Register) -> Bool {
@@ -147,6 +169,8 @@ extension BikeData.Register {
       return odometerLabel()
     case .trip:
       return tripLabel()
+    case .map:
+      return mapLabel()
     }
   }
 
@@ -185,6 +209,10 @@ extension BikeData.Register {
   func tripLabel() -> String {
     let km = Double(value).mm2km()
     return String(format: "Trip: %.2lfkm | %.2lfmi", km, km.km2mi())
+  }
+
+  func mapLabel() -> String {
+    return "Fuel map: \(value)"
   }
 
   func speedValueKmh() -> Double {

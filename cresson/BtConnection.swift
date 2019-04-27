@@ -30,6 +30,13 @@ class BtConnection: NSObject {
     self.manager = CBCentralManager(delegate: self, queue: nil)
   }
 
+  func send(_ data: Data) {
+    guard peripheral != nil && characteristic != nil else {
+      return
+    }
+    peripheral.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withoutResponse)
+  }
+
   private func onConnectionFailed(_ error: String) {
     connected = false
     delegate.status("connection failed: " + error)
@@ -45,7 +52,6 @@ class BtConnection: NSObject {
 
   private func dataIn(_ data: Data) {
     dataCollected += data
-    //let s = String(data: dataCollected, encoding: .utf8);
     while let n = dataCollected.firstIndex(of: UInt8(0x0A)) { // 0x0A = `\n`
       if let j = try? JSONDecoder().decode(BikeUpdate.self, from: dataCollected[..<n]) {
         delegate.update(j)

@@ -26,6 +26,9 @@ Register registers[] = {
     {12}  // Speed (km/h) = ((a * 100) + b) / 2
 };
 
+int fuelMap = 1;
+int fuelMapPin = 10;
+
 unsigned long cycle;
 bool shouldRequest(uint8_t id) {
   if (!id) {
@@ -41,15 +44,18 @@ bool shouldRequest(uint8_t id) {
 }
 
 unsigned long reportTime;
-char sz[512];
+char sz[256];
 
 void setup() {
   bt.begin(9600);
+  pinMode(fuelMapPin, OUTPUT);
+  setFuelMap();
   reportTime = millis();
   led.set(RgbLed::white);
 }
 
 void loop() {
+  processInput();
   if (kawa.getLastError() != 0) {
     connectToBike();
   }
@@ -59,6 +65,20 @@ void loop() {
     led.set(RgbLed::red);
     delay(1000);
   }
+}
+
+void processInput() {
+  if (!bt.available()) {
+    return;
+  }
+  do {
+    fuelMap = bt.read();
+  } while (bt.available());
+  setFuelMap();
+}
+
+void setFuelMap() {
+  digitalWrite(fuelMapPin, fuelMap == 2 ? HIGH : LOW);
 }
 
 void connectToBike() {

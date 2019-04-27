@@ -17,6 +17,7 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     btConnection = BtConnection(self)
+    bikeData.btConnection = btConnection
     dataView.register(UINib(nibName: "RegisterTableViewCell", bundle: nil), forCellReuseIdentifier: "RegisterTableViewCell")
     dataView.delegate = self
     dataView.dataSource = self
@@ -33,6 +34,9 @@ extension ViewController: BtConnectionDelegate {
     if connected != btConnection.connected {
       connected = btConnection.connected
       dataView.reloadData()
+      if connected {
+        bikeData.sendMap()
+      }
     }
     statusLabel.text = status
   }
@@ -63,18 +67,30 @@ extension ViewController: UITableViewDelegate {
     if id == .trip {
       return UISwipeActionsConfiguration(actions: [reset(register: id, at: indexPath)])
     }
+    if id == .map {
+      return UISwipeActionsConfiguration(actions: [switchMap(at: indexPath)])
+    }
     return UISwipeActionsConfiguration(actions: [])
   }
 
   private func reset(register: BikeData.RegisterId, at indexPath: IndexPath) -> UIContextualAction {
     let action = UIContextualAction(style: .normal, title: "Reset") { (action, view, completion) in
       self.bikeData.resetRegister(register)
-      self.bikeData.save()
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
     action.backgroundColor = .red
     return action
+  }
+
+  private func switchMap(at indexPath: IndexPath) -> UIContextualAction {
+    let current = bikeData.getRegister(.map)?.value ?? 0
+    let next = current == 1 ? 2 : 1
+    return UIContextualAction(style: .normal, title: "\(next)") { (action, view, completion) in
+      self.bikeData.setRegister(BikeData.Register(id: .map, value: next, timestamp: Date().timeIntervalSinceReferenceDate))
+      self.dataView.reloadRows(at: [indexPath], with: .none)
+      completion(true)
+    }
   }
 }
 
