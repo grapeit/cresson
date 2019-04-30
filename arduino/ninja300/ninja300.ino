@@ -1,8 +1,10 @@
 #include <SoftwareSerial.h>
+#include "FuelMap.h"
 #include "kawa.h"
 #include "led.h"
  
 SoftwareSerial bt(12, 13); // RX, TX
+FuelMap fuelMap(10, 0); // Pin, EEPROM address
 Kawa kawa; // uses Serial so do not use it anywhere else (pins 0 and 1)
 RgbLed led(4, 2, 3);
 
@@ -26,9 +28,6 @@ Register registers[] = {
     {12}  // Speed (km/h) = ((a * 100) + b) / 2
 };
 
-int fuelMap = 1;
-int fuelMapPin = 10;
-
 unsigned long cycle;
 bool shouldRequest(uint8_t id) {
   if (!id) {
@@ -48,8 +47,7 @@ char sz[256];
 
 void setup() {
   bt.begin(9600);
-  pinMode(fuelMapPin, OUTPUT);
-  setFuelMap();
+  fuelMap.setup();
   reportTime = millis();
   led.set(RgbLed::white);
 }
@@ -68,17 +66,9 @@ void loop() {
 }
 
 void processInput() {
-  if (!bt.available()) {
-    return;
+  while (bt.available()) {
+    fuelMap.input(bt.read());
   }
-  do {
-    fuelMap = bt.read();
-  } while (bt.available());
-  setFuelMap();
-}
-
-void setFuelMap() {
-  digitalWrite(fuelMapPin, fuelMap == 2 ? HIGH : LOW);
 }
 
 void connectToBike() {
@@ -131,6 +121,7 @@ void sendData() {
     }
   }
   sz[s++] = ']';
+  s += sprintf(sz + s, ",\"map\":%d", fuelMap.get());
   s += sprintf(sz + s, ",\"lastError\":%d", kawa.getLastError());
   s += sprintf(sz + s, ",\"time\":%ld", millis() - reportTime);
   sz[s++] = '}';

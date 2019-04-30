@@ -14,6 +14,7 @@ class BikeUpdate: Decodable, Encodable {
 
   let status: String
   let registers: [Register]
+  let map: Int
   let lastError: Int
   let time: TimeInterval
 }
@@ -29,13 +30,13 @@ class BikeData {
     case gear = 11
     case speed = 12
 
-    // client values
+    case map = 1000
+
     case odometer = -1
     case trip = -2
-    case map = -3
 
-    func isClient() -> Bool {
-      return self.rawValue < 0
+    func isLive() -> Bool {
+      return self.rawValue > 0
     }
   }
 
@@ -48,23 +49,24 @@ class BikeData {
   var registers = [Register]()
   var status = String()
   var time: TimeInterval
+  var connected = false
   var btConnection: BtConnection?
 
 
   init() {
     time = Date().timeIntervalSinceReferenceDate
     for id in RegisterId.allCases {
-      if id.isClient() {
-        loadRegister(id)
-      } else {
+      if id.isLive(){
         setRegister(Register(id: id, value: 0, timestamp: time))
+      } else {
+        loadRegister(id)
       }
     }
   }
 
   func save() {
     for r in registers {
-      if r.id.isClient() {
+      if !r.id.isLive() {
         saveRegister(r)
       }
     }
@@ -74,53 +76,55 @@ class BikeData {
     return registers.first() { $0.id == id } ?? nil
   }
 
-  func update(_ data: BikeUpdate) -> Bool {
+  func update(_ data: BikeUpdate) {
     status = String(format: "%@ (time: %.0lf/%.0lfms)", data.status, data.time, (Date().timeIntervalSinceReferenceDate - time) * 1000.0)
     time = Date().timeIntervalSinceReferenceDate
-    var reload = false
     for r in data.registers {
       guard let id = RegisterId(rawValue: r.id) else {
         continue
       }
       let newRegister = Register(id: id, value: r.value, timestamp: time)
       if id == .speed {
-        reload = updateOdometer(currentSpeed: newRegister) || reload
+        updateOdometer(currentSpeed: newRegister)
       }
-      reload = setRegister(newRegister) || reload
+      setRegister(newRegister)
     }
-    return reload
+    setRegister(Register(id: .map, value: data.map, timestamp: time))
+    connected = data.status == "bike is connected"
   }
 
-  func resetRegister(_ id: RegisterId) {
-    setRegister(Register(id: id, value: 0, timestamp: Date().timeIntervalSinceReferenceDate))
+  func setRegisterFromUI(_ register: Register) {
+    if register.id == .map {
+      sendMap(register.value)
+      return
+    }
+    setRegister(register)
+    if !register.id.isLive() {
+      saveRegister(register)
+    }
   }
 
-  @discardableResult func setRegister(_ register: Register) -> Bool {
-    var new = true
+  func resetRegisterFromUI(_ id: RegisterId) {
+    setRegisterFromUI(Register(id: id, value: 0, timestamp: Date().timeIntervalSinceReferenceDate))
+  }
+
+  private func setRegister(_ register: Register) {
     for (i, v) in registers.enumerated() {
       if v.id == register.id {
         registers[i] = register
-        new = false
-        break
+        return
       }
     }
-    if new {
-      registers.append(register)
-    }
-    if register.id.isClient() {
-      if register.id == .map {
-        sendMap()
-      }
-      saveRegister(register)
-    }
-    return new
+    registers.append(register)
   }
 
-  func sendMap() {
-    guard let btConnection = btConnection, let register = getRegister(.map) else {
+  private func sendMap(_ value: Int) {
+    guard let btConnection = btConnection else {
       return
     }
-    btConnection.send(Data(bytes: [UInt8(register.value)], count: 1))
+    var command = Array("map:".utf8)
+    command.append(UInt8(value))
+    btConnection.send(Data(bytes: command, count: command.count))
   }
 
   private func loadRegister(_ id: RegisterId) {
@@ -132,20 +136,19 @@ class BikeData {
     UserDefaults.standard.set(register.value, forKey: String(reflecting: register.id))
   }
 
-  private func updateOdometer(currentSpeed: Register) -> Bool {
+  private func updateOdometer(currentSpeed: Register) {
     guard let oldSpeed = getRegister(.speed) else {
-      return false
+      return
     }
     let time = currentSpeed.timestamp - oldSpeed.timestamp
     let speedMs = ((oldSpeed.speedValueKmh() + currentSpeed.speedValueKmh()) / 2.0).kmh2ms()
     let distanceMm = Int((speedMs * time).m2mm().rounded())
-    let add = { (r: RegisterId) -> Bool in
+    let add = { (r: RegisterId) in
       let v = self.getRegister(r)?.value ?? 0
-      return self.setRegister(Register(id: r, value: v + distanceMm, timestamp: currentSpeed.timestamp))
+      self.setRegister(Register(id: r, value: v + distanceMm, timestamp: currentSpeed.timestamp))
     }
-    let co = add(.odometer)
-    let ct = add(.trip)
-    return co || ct
+    add(.odometer)
+    add(.trip)
   }
 }
 

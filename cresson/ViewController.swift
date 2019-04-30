@@ -13,7 +13,6 @@ class ViewController: UIViewController {
   var saveTimer: Timer!
   var connected = false
 
-
   override func viewDidLoad() {
     super.viewDidLoad()
     btConnection = BtConnection(self)
@@ -31,27 +30,24 @@ class ViewController: UIViewController {
 extension ViewController: BtConnectionDelegate {
   func status(_ status: String) {
     print(status)
-    if connected != btConnection.connected {
-      connected = btConnection.connected
+    if !btConnection.connected {
+      connected = false
       dataView.reloadData()
-      if connected {
-        bikeData.sendMap()
-      }
     }
     statusLabel.text = status
   }
 
   func update(_ data: BikeUpdate) {
     print(String(data: try! JSONEncoder().encode(data), encoding: .utf8)!)
-    let reload = bikeData.update(data)
-    if reload {
-      dataView.reloadData()
-    } else {
-      for c in dataView.visibleCells {
-        if let c = c as? RegisterTableViewCell, let id = c.registerId, let r = bikeData.getRegister(id) {
-          c.setRegister(r, connected: connected)
-        }
+    bikeData.update(data)
+    for c in dataView.visibleCells {
+      if let c = c as? RegisterTableViewCell, let id = c.registerId, let r = bikeData.getRegister(id) {
+        c.setRegister(r, connected: connected)
       }
+    }
+    if connected != bikeData.connected {
+      connected = bikeData.connected
+      dataView.reloadData()
     }
     statusLabel.text = bikeData.status
   }
@@ -67,7 +63,7 @@ extension ViewController: UITableViewDelegate {
     if id == .trip {
       return UISwipeActionsConfiguration(actions: [reset(register: id, at: indexPath)])
     }
-    if id == .map {
+    if id == .map && connected {
       return UISwipeActionsConfiguration(actions: [switchMap(at: indexPath)])
     }
     return UISwipeActionsConfiguration(actions: [])
@@ -75,7 +71,7 @@ extension ViewController: UITableViewDelegate {
 
   private func reset(register: BikeData.RegisterId, at indexPath: IndexPath) -> UIContextualAction {
     let action = UIContextualAction(style: .normal, title: "Reset") { (action, view, completion) in
-      self.bikeData.resetRegister(register)
+      self.bikeData.resetRegisterFromUI(register)
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
@@ -87,7 +83,7 @@ extension ViewController: UITableViewDelegate {
     let current = bikeData.getRegister(.map)?.value ?? 0
     let next = current == 1 ? 2 : 1
     return UIContextualAction(style: .normal, title: "\(next)") { (action, view, completion) in
-      self.bikeData.setRegister(BikeData.Register(id: .map, value: next, timestamp: Date().timeIntervalSinceReferenceDate))
+      self.bikeData.setRegisterFromUI(BikeData.Register(id: .map, value: next, timestamp: Date().timeIntervalSinceReferenceDate))
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
