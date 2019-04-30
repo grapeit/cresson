@@ -51,6 +51,7 @@ class BikeData {
   var time: TimeInterval
   var connected = false
   var btConnection: BtConnection?
+  var mapToSend: Int?
 
 
   init() {
@@ -90,12 +91,15 @@ class BikeData {
       setRegister(newRegister)
     }
     setRegister(Register(id: .map, value: data.map, timestamp: time))
+    if let mapToSend = mapToSend, mapToSend != data.map {
+      sendMap(mapToSend, withRetry: false)
+    }
     connected = data.status == "bike is connected"
   }
 
   func setRegisterFromUI(_ register: Register) {
     if register.id == .map {
-      sendMap(register.value)
+      sendMap(register.value, withRetry: true)
       return
     }
     setRegister(register)
@@ -118,10 +122,11 @@ class BikeData {
     registers.append(register)
   }
 
-  private func sendMap(_ value: Int) {
+  private func sendMap(_ value: Int, withRetry retry: Bool) {
     guard let btConnection = btConnection else {
       return
     }
+    mapToSend = retry ? value : nil
     var command = Array("map:".utf8)
     command.append(UInt8(value))
     btConnection.send(Data(bytes: command, count: command.count))
