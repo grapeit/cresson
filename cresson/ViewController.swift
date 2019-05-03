@@ -8,15 +8,14 @@ class ViewController: UIViewController {
   @IBOutlet weak var dataView: UITableView!
   @IBOutlet weak var statusLabel: UILabel!
 
-  var btConnection: BtConnection!
+  var btConnection = BtConnection()
   let bikeData = BikeData()
   var saveTimer: Timer!
   var connected = false
 
+
   override func viewDidLoad() {
     super.viewDidLoad()
-    btConnection = BtConnection(self)
-    bikeData.btConnection = btConnection
     dataView.register(UINib(nibName: "RegisterTableViewCell", bundle: nil), forCellReuseIdentifier: "RegisterTableViewCell")
     dataView.delegate = self
     dataView.dataSource = self
@@ -25,6 +24,9 @@ class ViewController: UIViewController {
     saveTimer = Timer.scheduledTimer(withTimeInterval: registerSaveInterval, repeats: true) { _ in self.bikeData.save() }
     NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
     NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
+    btConnection.delegate = self
+    btConnection.start()
+    bikeData.btConnection = btConnection
   }
 }
 

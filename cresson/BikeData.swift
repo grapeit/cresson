@@ -50,8 +50,8 @@ class BikeData {
   var status = String()
   var time: TimeInterval
   var connected = false
-  var btConnection: BtConnection?
   var mapToSend: Int?
+  weak var btConnection: BtConnection?
 
 
   init() {
