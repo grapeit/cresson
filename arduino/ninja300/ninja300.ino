@@ -106,6 +106,7 @@ void requestRegisters() {
 }
 
 void sendData() {
+  processInput(); // check for input that may come during negotiation with bike
   led.set(RgbLed::blue);
   //NOTE: sending payload to `bt` in pieces will allow to decrease size of `sz` buffer 
   int s = sprintf(sz, "{\"status\":\"%s\",\"registers\":[", currentStatus);

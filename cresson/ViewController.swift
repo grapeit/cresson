@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     dataView.register(UINib(nibName: "RegisterTableViewCell", bundle: nil), forCellReuseIdentifier: "RegisterTableViewCell")
     dataView.delegate = self
     dataView.dataSource = self
+    dataView.tableFooterView = UIView(frame: .zero)
     statusLabel.text = ""
     saveTimer = Timer.scheduledTimer(withTimeInterval: registerSaveInterval, repeats: true) { _ in self.bikeData.save() }
     NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
