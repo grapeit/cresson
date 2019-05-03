@@ -1,5 +1,6 @@
 import Foundation
 
+
 class BikeUpdate: Decodable, Encodable {
 
   struct Register: Decodable, Encodable {
@@ -47,6 +48,7 @@ class BikeData {
   }
 
   var registers = [Register]()
+  var logger = Logger()
   var status = String()
   var time: TimeInterval
   var connected = false
@@ -94,6 +96,7 @@ class BikeData {
     if let mapToSend = mapToSend, mapToSend != data.map {
       sendMap(mapToSend, withRetry: false)
     }
+    logger.log(registers)
     connected = data.status == "bike is connected"
   }
 
@@ -146,7 +149,7 @@ class BikeData {
       return
     }
     let time = currentSpeed.timestamp - oldSpeed.timestamp
-    let speedMs = ((oldSpeed.speedValueKmh() + currentSpeed.speedValueKmh()) / 2.0).kmh2ms()
+    let speedMs = ((oldSpeed.normalizeSpeed() + currentSpeed.normalizeSpeed()) / 2.0).kmh2ms()
     let distanceMm = Int((speedMs * time).m2mm().rounded())
     let add = { (r: RegisterId) in
       let v = self.getRegister(r)?.value ?? 0
@@ -159,6 +162,57 @@ class BikeData {
 
 
 extension BikeData.Register {
+  // using km for distance, kh/h for speed, celsius for temperature, [0...1] for percentage
+  func normalize() -> Double {
+    switch id {
+    case .throttle:
+      return normalizeThrottle()
+    case .coolant:
+      return normalizeTemperature()
+    case .rpm:
+      return normalizeRpm()
+    case .battery:
+      return normalizeVoltage()
+    case .speed:
+      return normalizeSpeed()
+    case .odometer, .trip:
+      return normalizeOdometer()
+    case .gear, .map:
+      return normalizeAsIs()
+    }
+  }
+
+  func normalizeThrottle() -> Double {
+    // set for killswitch set to ON, when killswitch is OFF bounds differ so using min(max())
+    let lowerBound = 0x00D2
+    let upperBound = 0x037A
+    return min(1.0, max(0.0, Double(value - lowerBound) / Double(upperBound - lowerBound)))
+  }
+
+  func normalizeTemperature() -> Double {
+    return Double(value - 48) / 1.6
+  }
+
+  func normalizeRpm() -> Double {
+    return Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF))
+  }
+
+  func normalizeVoltage() -> Double {
+    return Double(value) / 12.75
+  }
+
+  func normalizeSpeed() -> Double {
+    return Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0
+  }
+
+  func normalizeOdometer() -> Double {
+    return Double(value).mm2km()
+  }
+
+  func normalizeAsIs() -> Double {
+    return Double(value)
+  }
+
   func label() -> String {
     switch id {
     case .throttle:
@@ -183,21 +237,20 @@ extension BikeData.Register {
   }
 
   func throttleLabel() -> String {
-    let v = Double(value - 0x00D2) / Double(0x037A - 0x00D2) * 100.0
-    return String(format: "Throttle: %.0lf%%", min(100.0, max(0.0, v)))
+    return String(format: "Throttle: %.0lf%%", normalizeThrottle() * 100.0)
   }
 
   func coolantLabel() -> String {
-    let c = Double(value - 48) / 1.6
+    let c = normalizeTemperature()
     return String(format: "Coolant: %.0lf°C | %.0lf°F", c, c.c2f())
   }
 
   func rpmLabel() -> String {
-    return String(format: "RPM: %d", ((value & 0xFF00) >> 8) * 100 + (value & 0xFF))
+    return String(format: "RPM: %.0lf", normalizeRpm())
   }
 
   func batteryLabel() -> String {
-    return String(format: "Battery: %.2lfV", Double(value) / 12.75)
+    return String(format: "Battery: %.2lfV", normalizeVoltage())
   }
 
   func gearLabel() -> String {
@@ -205,25 +258,21 @@ extension BikeData.Register {
   }
 
   func speedLabel() -> String {
-    let kmh = speedValueKmh()
+    let kmh = normalizeSpeed()
     return String(format: "Speed: %.0lfkm/h | %.0lfmph", kmh, kmh.km2mi())
   }
 
   func odometerLabel() -> String {
-    let km = Double(value).mm2km()
+    let km = normalizeOdometer()
     return String(format: "Odo: %.0lfkm | %.0lfmi", km, km.km2mi())
   }
 
   func tripLabel() -> String {
-    let km = Double(value).mm2km()
+    let km = normalizeOdometer()
     return String(format: "Trip: %.2lfkm | %.2lfmi", km, km.km2mi())
   }
 
   func mapLabel() -> String {
     return "Fuel map: \(value)"
-  }
-
-  func speedValueKmh() -> Double {
-    return Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0
   }
 }

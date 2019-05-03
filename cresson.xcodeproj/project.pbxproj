@@ -14,6 +14,7 @@
 		FA317246220E53460081DB6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA317245220E53460081DB6B /* Assets.xcassets */; };
 		FA317249220E53460081DB6B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317247220E53460081DB6B /* LaunchScreen.storyboard */; };
 		FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6837D9220E912F00A60BB4 /* BtConnection.swift */; };
+		FA93BE72227BD6C5008AB1D8 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA93BE71227BD6C5008AB1D8 /* Logger.swift */; };
 		FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* BikeData.swift */; };
 		FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */; };
 		FADEE41D221BA73F0046CB4B /* RegisterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */; };
@@ -29,6 +30,7 @@
 		FA317248220E53460081DB6B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FA31724A220E53460081DB6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA6837D9220E912F00A60BB4 /* BtConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtConnection.swift; sourceTree = "<group>"; };
+		FA93BE71227BD6C5008AB1D8 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		FAB8333B220F5C2D00BE63FB /* BikeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeData.swift; sourceTree = "<group>"; };
 		FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewCell.swift; sourceTree = "<group>"; };
 		FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegisterTableViewCell.xib; sourceTree = "<group>"; };
@@ -67,8 +69,9 @@
 				FA31723E220E53440081DB6B /* AppDelegate.swift */,
 				FA317240220E53440081DB6B /* ViewController.swift */,
 				FAB8333B220F5C2D00BE63FB /* BikeData.swift */,
-				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
+				FA93BE71227BD6C5008AB1D8 /* Logger.swift */,
 				FA012584227299D8004A648F /* Conversion.swift */,
+				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
 				FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */,
 				FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */,
@@ -156,6 +159,7 @@
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
 				FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */,
 				FA012585227299D8004A648F /* Conversion.swift in Sources */,
+				FA93BE72227BD6C5008AB1D8 /* Logger.swift in Sources */,
 				FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
 			);
