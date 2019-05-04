@@ -47,6 +47,8 @@ class BikeData {
     let timestamp: TimeInterval
   }
 
+  static var speedCompensation = 1.1 //TODO: empiric value, make it configurable
+
   var registers = [Register]()
   var logger = Logger()
   var status = String()
@@ -202,7 +204,7 @@ extension BikeData.Register {
   }
 
   func normalizeSpeed() -> Double {
-    return Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0
+    return Double(((value & 0xFF00) >> 8) * 100 + (value & 0xFF)) / 2.0 * BikeData.speedCompensation
   }
 
   func normalizeOdometer() -> Double {

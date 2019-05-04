@@ -1,8 +1,9 @@
-- speed error compensation
 - log data feed to file
 - upload logged data to a database
+- debug case when app cannot find bluetooth device
 - status/configuration screen
 - adjustable speed error compensation
+- adjust speedo/odo readings, check with GPS
 - better status line
 - multi-user/multi-bike support
 - data charts
