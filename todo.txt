@@ -1,0 +1,10 @@
+- speed error compensation
+- log data feed to file
+- upload logged data to a database
+- status/configuration screen
+- adjustable speed error compensation
+- better status line
+- multi-user/multi-bike support
+- data charts
+- speed up data feed
+- keep odometer on arduino, update when disconnected

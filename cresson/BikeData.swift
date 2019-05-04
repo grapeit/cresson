@@ -24,17 +24,17 @@ class BikeUpdate: Decodable, Encodable {
 class BikeData {
 
   enum RegisterId: Int, CaseIterable {
-    case throttle = 4
-    case coolant = 6
-    case rpm = 9
-    case battery = 10
     case gear = 11
+    case throttle = 4
+    case rpm = 9
     case speed = 12
+    case coolant = 6
+    case battery = 10
 
     case map = 1000
 
-    case odometer = -1
-    case trip = -2
+    case trip = -1
+    case odometer = -2
 
     func isLive() -> Bool {
       return self.rawValue > 0
