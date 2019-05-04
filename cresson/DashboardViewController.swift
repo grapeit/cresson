@@ -3,7 +3,7 @@ import UIKit
 let registerSaveInterval = 20.0
 
 
-class ViewController: UIViewController {
+class DashboardViewController: UIViewController {
 
   @IBOutlet weak var dataView: UITableView!
   @IBOutlet weak var statusLabel: UILabel!
@@ -30,7 +30,7 @@ class ViewController: UIViewController {
   }
 }
 
-extension ViewController: BtConnectionDelegate {
+extension DashboardViewController: BtConnectionDelegate {
   func status(_ status: String) {
     print(status)
     if !btConnection.connected {
@@ -56,7 +56,7 @@ extension ViewController: BtConnectionDelegate {
   }
 }
 
-extension ViewController: UITableViewDelegate {
+extension DashboardViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return bikeData.registers.count
   }
@@ -93,7 +93,7 @@ extension ViewController: UITableViewDelegate {
   }
 }
 
-extension ViewController: UITableViewDataSource {
+extension DashboardViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = dataView.dequeueReusableCell(withIdentifier: "RegisterTableViewCell", for: indexPath)
     if let cell = cell as? RegisterTableViewCell {

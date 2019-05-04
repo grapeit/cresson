@@ -10,16 +10,16 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Dashboard-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="cresson" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Dashboard" id="BYZ-38-t0r" customClass="DashboardViewController" customModule="cresson" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ecY-Oa-Ya7">
-                                <rect key="frame" x="16" y="626" width="343" height="21"/>
+                                <rect key="frame" x="16" y="626" width="50" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -29,16 +29,30 @@
                                 <color key="backgroundColor" red="0.91876435279846191" green="0.95213669538497925" blue="0.8317340612411499" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gT1-VM-vOs">
+                                <rect key="frame" x="311" y="620" width="64" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="44b-ka-x3w"/>
+                                    <constraint firstAttribute="width" constant="64" id="Dl7-Kn-ZfO"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <state key="normal" title="i"/>
+                                <connections>
+                                    <segue destination="4eL-A1-yCh" kind="show" identifier="ShowStatus" id="9eD-Hf-mRE"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.91876435279846191" green="0.95213669538497925" blue="0.8317340612411499" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="8Ox-7H-Zgc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="4fx-LU-O1O"/>
                             <constraint firstItem="8Ox-7H-Zgc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="C0u-Lw-sMU"/>
                             <constraint firstItem="ecY-Oa-Ya7" firstAttribute="top" secondItem="8Ox-7H-Zgc" secondAttribute="bottom" constant="8" id="GvC-KU-WX8"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ecY-Oa-Ya7" secondAttribute="trailing" constant="16" id="Lkd-W0-EgD"/>
                             <constraint firstItem="ecY-Oa-Ya7" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="Taf-gX-B8y"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="8Ox-7H-Zgc" secondAttribute="trailing" constant="16" id="Wex-zu-cdj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="ecY-Oa-Ya7" secondAttribute="bottom" constant="20" id="hYr-LW-1C4"/>
+                            <constraint firstItem="ecY-Oa-Ya7" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="gT1-VM-vOs" secondAttribute="leading" id="joR-LI-P3E"/>
+                            <constraint firstItem="gT1-VM-vOs" firstAttribute="top" secondItem="8Ox-7H-Zgc" secondAttribute="bottom" constant="2" id="qSJ-pF-2HX"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gT1-VM-vOs" secondAttribute="trailing" id="rN8-WZ-uPL"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -50,6 +64,35 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="128.80000000000001" y="130.88455772113943"/>
+        </scene>
+        <!--Status-->
+        <scene sceneID="JUo-Cp-lj5">
+            <objects>
+                <viewController title="Status" id="4eL-A1-yCh" customClass="StatusViewController" customModule="cresson" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Mv7-PF-wxc">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jPX-gB-Ewb">
+                                <rect key="frame" x="215" y="614" width="144" height="33"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Back to dashboard"/>
+                                <connections>
+                                    <action selector="back:" destination="4eL-A1-yCh" eventType="touchUpInside" id="PAL-oE-ffY"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.91876435279846191" green="0.95213669538497925" blue="0.8317340612411499" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="yFk-at-iuh" firstAttribute="trailing" secondItem="jPX-gB-Ewb" secondAttribute="trailing" constant="16" id="DSb-Ow-wNw"/>
+                            <constraint firstItem="yFk-at-iuh" firstAttribute="bottom" secondItem="jPX-gB-Ewb" secondAttribute="bottom" constant="20" id="I4H-UL-n8N"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="yFk-at-iuh"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="d2Q-z9-2NG" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="882" y="131"/>
         </scene>
     </scenes>
 </document>
