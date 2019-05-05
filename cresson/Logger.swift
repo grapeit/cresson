@@ -2,6 +2,9 @@ import Foundation
 
 
 class Logger {
+  private let fileSizeLimit = 512 * 1024
+  private let fileNamePrefix = "data_feed-"
+  private let fileNameSuffix = ".log"
   private var currentFile: FileHandle?
 
 
@@ -27,24 +30,35 @@ class Logger {
     //QUESTION: does `write` throw? documentation says it does, compiler thinks otherwise
     file.write(data)
     file.write("\n".data(using: .ascii)!)
+    if file.offsetInFile >= fileSizeLimit {
+      currentFile = nil
+    }
   }
 
   private func getFileHandle() -> FileHandle? {
     if currentFile != nil {
       return currentFile
     }
-    let fm = FileManager.default
-    guard var url = try? fm.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
+    guard var url = try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
       return nil
     }
-    url.appendPathComponent("data_feed.log")
-    if !fm.fileExists(atPath: url.path) {
-      fm.createFile(atPath: url.path, contents: nil)
+    guard let files = try? FileManager.default.contentsOfDirectory(atPath: url.path) else {
+      return nil
     }
+    var index = 0
+    for f in files {
+      if f.hasPrefix(fileNamePrefix) && f.hasSuffix(fileNameSuffix) {
+        let indexRange = f.index(f.startIndex, offsetBy: fileNamePrefix.count)..<f.index(f.endIndex, offsetBy: -fileNameSuffix.count)
+        if let i = Int(f[indexRange]), i > index {
+          index = i
+        }
+      }
+    }
+    index += 1
+    let fileName = fileNamePrefix + "\(index)" + fileNameSuffix
+    url.appendPathComponent(fileName)
+    FileManager.default.createFile(atPath: url.path, contents: nil)
     currentFile = try? FileHandle(forWritingTo: url)
-    guard currentFile != nil else {
-      return nil
-    }
     return currentFile
   }
 }
