@@ -67,6 +67,7 @@ class BikeData {
         loadRegister(id)
       }
     }
+    logger.initBackgoundUpload()
   }
 
   func save() {
