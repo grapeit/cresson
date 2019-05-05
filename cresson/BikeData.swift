@@ -132,9 +132,9 @@ class BikeData {
       return
     }
     mapToSend = retry ? value : nil
-    var command = Array("map:".utf8)
-    command.append(UInt8(value))
-    btConnection.send(Data(bytes: command, count: command.count))
+    var command = "map:".data(using: .ascii)!
+    command.append([UInt8(value)], count: 1)
+    btConnection.send(command)
   }
 
   private func loadRegister(_ id: RegisterId) {

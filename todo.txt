@@ -1,5 +1,6 @@
-- log data feed to file
+- rotate log data files
 - upload logged data to a database
+- handle local file write failures
 - debug case when app cannot find bluetooth device
 - status/configuration screen
 - adjustable speed error compensation
