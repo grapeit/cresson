@@ -2,13 +2,49 @@ import Foundation
 
 
 class Logger {
+
+  private class UploadCounter {
+    private var counter = 0
+
+    func start() {
+      objc_sync_enter(self)
+      counter += 1
+      objc_sync_exit(self)
+    }
+
+    func startIfNotUploading() -> Bool {
+      objc_sync_enter(self)
+      let r = counter == 0
+      if r {
+        counter += 1
+      }
+      objc_sync_exit(self)
+      return r
+    }
+
+    func finish() {
+      objc_sync_enter(self)
+      counter -= 1
+      objc_sync_exit(self)
+    }
+  }
+
+
+  private struct ServerResponse: Decodable {
+    let status: String
+  }
+
+
   private let fileSizeLimit = 512 * 1024
   private let fileNamePrefix = "data_feed-"
   private let fileNameSuffix = ".log"
+  //private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
+  private let uploadService = URL(string: "http://10.0.0.250/upload")!
   private let uploadInterval = 60.0
+  private let uploadingFilesLimit = 5
   private var currentFile: FileHandle?
   private var uploadTimer: Timer?
-  private var uploading = false //TODO: need to make this one atomic?
+  private var uploadCounter = UploadCounter()
 
 
   func log(_ registers: [BikeData.Register]) {
@@ -80,11 +116,10 @@ class Logger {
   }
 
   private func upload() {
-    guard !uploading else {
+    guard uploadCounter.startIfNotUploading() else {
       return
     }
-    uploading = true
-    defer { uploading = false }
+    defer { uploadCounter.finish() }
     guard let url = try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false) else {
       return
     }
@@ -96,21 +131,31 @@ class Logger {
       return
     }
     toUpload.sort { return $0.compare($1, options: .numeric) == .orderedAscending }
-    for f in toUpload[..<toUpload.index(toUpload.endIndex, offsetBy: -1)] {
-      let url = url.appendingPathComponent(f)
-      guard upload(url) else {
-        return
-      }
-      //TODO: uncomment when ready
-      //try? FileManager.default.removeItem(at: url)
+    // excluding last file as it is a current log
+    for f in toUpload[..<min(toUpload.count - 1, uploadingFilesLimit)] {
+      upload(url.appendingPathComponent(f))
     }
   }
 
-  private func upload(_ file: URL) -> Bool {
+  private func upload(_ file: URL) {
     guard let payload = try? Data(contentsOf: file), let compressed = payload.compressed() else {
-      return false
+      return
     }
-    print("Logger.upload(%@): %d => %d", file.path, payload.count, compressed.count)
-    return true
+    print("Logger.upload", file.path, payload.count, compressed.count)
+    var request = URLRequest(url: uploadService)
+    request.httpMethod = "POST"
+    request.addValue("application/zlib", forHTTPHeaderField: "Content-Type")
+    request.httpBody = compressed
+    uploadCounter.start()
+    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+      defer { self.uploadCounter.finish() }
+      guard error == nil, let data = data, let r = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
+        return
+      }
+      if r.status == "OK" {
+        try? FileManager.default.removeItem(at: file)
+      }
+    }
+    task.resume()
   }
 }
