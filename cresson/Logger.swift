@@ -92,21 +92,25 @@ class Logger {
       return
     }
     var toUpload = files.filter { fileIndex(of: $0) != nil }
+    guard toUpload.count > 1 else {
+      return
+    }
     toUpload.sort { return $0.compare($1, options: .numeric) == .orderedAscending }
     for f in toUpload[..<toUpload.index(toUpload.endIndex, offsetBy: -1)] {
       let url = url.appendingPathComponent(f)
       guard upload(url) else {
         return
       }
+      //TODO: uncomment when ready
       //try? FileManager.default.removeItem(at: url)
     }
   }
 
   private func upload(_ file: URL) -> Bool {
-    guard let payload = try? Data(contentsOf: file) else {
+    guard let payload = try? Data(contentsOf: file), let compressed = payload.compressed() else {
       return false
     }
-    print("Logger.upload(%@): %d", file.path, payload.count)
+    print("Logger.upload(%@): %d => %d", file.path, payload.count, compressed.count)
     return true
   }
 }

@@ -41,7 +41,6 @@ extension DashboardViewController: BtConnectionDelegate {
   }
 
   func update(_ data: BikeUpdate) {
-    print(String(data: try! JSONEncoder().encode(data), encoding: .utf8)!)
     bikeData.update(data)
     for c in dataView.visibleCells {
       if let c = c as? RegisterTableViewCell, let id = c.registerId, let r = bikeData.getRegister(id) {

@@ -13,6 +13,7 @@
 		FA317244220E53440081DB6B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317242220E53440081DB6B /* Main.storyboard */; };
 		FA317246220E53460081DB6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA317245220E53460081DB6B /* Assets.xcassets */; };
 		FA317249220E53460081DB6B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317247220E53460081DB6B /* LaunchScreen.storyboard */; };
+		FA5C2B07227F613E001E9D83 /* DataCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA5C2B06227F613E001E9D83 /* DataCompression.swift */; };
 		FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6837D9220E912F00A60BB4 /* BtConnection.swift */; };
 		FA93BE72227BD6C5008AB1D8 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA93BE71227BD6C5008AB1D8 /* Logger.swift */; };
 		FA93BE76227D3689008AB1D8 /* StatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA93BE75227D3689008AB1D8 /* StatusViewController.swift */; };
@@ -30,6 +31,7 @@
 		FA317245220E53460081DB6B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FA317248220E53460081DB6B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FA31724A220E53460081DB6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA5C2B06227F613E001E9D83 /* DataCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCompression.swift; sourceTree = "<group>"; };
 		FA6837D9220E912F00A60BB4 /* BtConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtConnection.swift; sourceTree = "<group>"; };
 		FA93BE71227BD6C5008AB1D8 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		FA93BE75227D3689008AB1D8 /* StatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusViewController.swift; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 				FA93BE75227D3689008AB1D8 /* StatusViewController.swift */,
 				FAB8333B220F5C2D00BE63FB /* BikeData.swift */,
 				FA93BE71227BD6C5008AB1D8 /* Logger.swift */,
+				FA5C2B06227F613E001E9D83 /* DataCompression.swift */,
 				FA012584227299D8004A648F /* Conversion.swift */,
 				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
@@ -163,6 +166,7 @@
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
 				FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */,
 				FA012585227299D8004A648F /* Conversion.swift in Sources */,
+				FA5C2B07227F613E001E9D83 /* DataCompression.swift in Sources */,
 				FA93BE72227BD6C5008AB1D8 /* Logger.swift in Sources */,
 				FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
