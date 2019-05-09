@@ -4,3 +4,5 @@
 *xcuserdata
 *.xcscmblueprint
 .DS_Store
+.idea
+server/bin/
