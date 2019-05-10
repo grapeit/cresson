@@ -40,9 +40,9 @@ class Logger {
   private let fileNamePrefix = "data_feed-"
   private let fileNameSuffix = ".log"
   //private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
-  private let uploadService = URL(string: "http://10.0.0.55:2224/upload")!
+  private let uploadService = URL(string: "http://10.0.0.55:2222/upload")!
   private let uploadInterval = 60.0
-  private let uploadingFilesLimit = 15
+  private let uploadingFilesLimit = 5
   private var currentFile: FileHandle?
   private var uploadTimer: Timer?
   private var uploadCounter = UploadCounter()
@@ -145,10 +145,8 @@ class Logger {
     print("Logger.upload", file.path, payload.count, compressed.count)
     var request = URLRequest(url: uploadService)
     request.httpMethod = "POST"
-    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.httpBody = payload
-    //request.addValue("application/zlib", forHTTPHeaderField: "Content-Type")
-    //request.httpBody = compressed
+    request.addValue("application/zlib", forHTTPHeaderField: "Content-Type")
+    request.httpBody = compressed
     uploadCounter.start()
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
       defer { self.uploadCounter.finish() }
