@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-sql-driver/mysql"
 	"io"
 	"strconv"
 	"strings"
@@ -15,8 +16,6 @@ import (
 import _ "github.com/go-sql-driver/mysql"
 
 const (
-	dbDriverName = "mysql"
-	dbConnectString = "cresson:blaxamuxanazad@tcp(10.0.0.250:3306)/cresson" // user:password@/dbname
 	tableName = "data_log"
 	idColumn = "user"
 )
@@ -24,8 +23,8 @@ var database *sql.DB
 var dataColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
 var sqlInsertPrefix = ""
 
-func init() {
-	db, err := sql.Open(dbDriverName, dbConnectString)
+func initUpload() {
+	db, err := sql.Open(config.DbDriverName, config.DbConnectString)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -85,9 +84,13 @@ func uploadHandler(c *gin.Context) {
 	dbBegin := time.Now()
 	res, err := database.Exec(sqlStatement.String());
 	if err != nil {
-		fmt.Println("Error: ", err.Error())
-		c.String(501, err.Error())
-		return
+		if isDuplicate(err) {
+			fmt.Println("Already there")
+		} else {
+			fmt.Println("Error: ", err.Error())
+			c.String(501, err.Error())
+			return
+		}
 	} else {
 		rows, _ := res.RowsAffected()
 		fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin));
@@ -95,4 +98,9 @@ func uploadHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": "implementing...",
 	})
+}
+
+func isDuplicate(err error) bool {
+	mysqlerr, ok := err.(*mysql.MySQLError)
+	return ok && mysqlerr.Number == 1062
 }

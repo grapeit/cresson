@@ -5,8 +5,11 @@ import (
 )
 
 func main() {
+	// config must be initialized first
+	initConfig()
+	initUpload()
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 	r.POST("/upload", uploadHandler)
-	_ = r.Run("0.0.0.0:2222")
+	_ = r.Run(config.Listen)
 }
