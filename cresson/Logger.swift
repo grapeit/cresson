@@ -42,7 +42,7 @@ class Logger {
   //private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
   private let uploadService = URL(string: "http://10.0.0.55:2222/upload")!
   private let uploadInterval = 60.0
-  private let uploadingFilesLimit = 5
+  private let uploadingFilesLimit = 15
   private var currentFile: FileHandle?
   private var uploadTimer: Timer?
   private var uploadCounter = UploadCounter()
