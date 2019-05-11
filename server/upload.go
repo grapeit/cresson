@@ -17,7 +17,7 @@ import _ "github.com/go-sql-driver/mysql"
 
 const (
 	tableName = "data_log"
-	idColumn = "user"
+	idColumn = "bike"
 )
 var database *sql.DB
 var dataColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
