@@ -104,7 +104,7 @@ func uploadHandler(c *gin.Context) {
 		}
 	}
 	c.JSON(200, gin.H{
-		"status": "implementing...",
+		"status": "OK",
 	})
 }
 
