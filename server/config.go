@@ -9,6 +9,7 @@ type Configuration struct {
 	Listen          string `json:"listen"`
 	DbDriverName    string `json:"db_driver"`
 	DbConnectString string `json:"db_address"`
+	Debug           bool   `json:"debug"`
 }
 var config Configuration
 

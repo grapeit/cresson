@@ -40,9 +40,9 @@ class Logger {
   private let fileNamePrefix = "data_feed-"
   private let fileNameSuffix = ".log"
   //private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
-  private let uploadService = URL(string: "http://10.0.0.55:2222/upload")!
+  private let uploadService = URL(string: "http://10.0.0.250:2222/upload")!
   private let uploadInterval = 60.0
-  private let uploadingFilesLimit = 15
+  private let uploadingFilesLimit = 5
   private var currentFile: FileHandle?
   private var uploadTimer: Timer?
   private var uploadCounter = UploadCounter()
@@ -96,7 +96,7 @@ class Logger {
     if currentFile != nil {
       return currentFile
     }
-    guard var url = try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
+    guard var url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
       return nil
     }
     guard let files = try? FileManager.default.contentsOfDirectory(atPath: url.path) else {
@@ -121,7 +121,7 @@ class Logger {
       return
     }
     defer { uploadCounter.finish() }
-    guard let url = try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false) else {
+    guard let url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) else {
       return
     }
     guard let files = try? FileManager.default.contentsOfDirectory(atPath: url.path) else {

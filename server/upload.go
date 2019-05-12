@@ -58,7 +58,9 @@ func uploadHandler(c *gin.Context) {
 			if err == io.EOF {
 				break
 			} else {
-				fmt.Println("Error: ", err.Error())
+				if config.Debug {
+					fmt.Println("Error: ", err.Error())
+				}
 				c.String(501, err.Error())
 				return
 			}
@@ -85,15 +87,21 @@ func uploadHandler(c *gin.Context) {
 	res, err := database.Exec(sqlStatement.String());
 	if err != nil {
 		if isDuplicate(err) {
-			fmt.Println("Already there")
+			if config.Debug {
+				fmt.Println("Already there")
+			}
 		} else {
-			fmt.Println("Error: ", err.Error())
+			if config.Debug {
+				fmt.Println("Error: ", err.Error())
+			}
 			c.String(501, err.Error())
 			return
 		}
 	} else {
 		rows, _ := res.RowsAffected()
-		fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin));
+		if config.Debug {
+			fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin));
+		}
 	}
 	c.JSON(200, gin.H{
 		"status": "implementing...",
