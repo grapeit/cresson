@@ -12,3 +12,7 @@ CREATE TABLE IF NOT EXISTS `data_log` (
   odometer DOUBLE,
   PRIMARY KEY `pk` (`bike`,`ts`)
 ) DEFAULT CHARSET=utf8;
+
+GRANT USAGE ON cresson.* TO 'cresson'@'localhost' IDENTIFIED BY 'blaxamuxanazad';
+GRANT ALL PRIVILEGES ON cresson.* TO 'cresson'@'localhost';
+FLUSH PRIVILEGES;

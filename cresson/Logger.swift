@@ -39,8 +39,8 @@ class Logger {
   private let fileSizeLimit = 512 * 1024
   private let fileNamePrefix = "data_feed-"
   private let fileNameSuffix = ".log"
-  //private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
-  private let uploadService = URL(string: "http://10.0.0.250:2222/upload")!
+  private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
+  //private let uploadService = URL(string: "http://10.0.0.250:2222/upload")!
   private let uploadInterval = 60.0
   private let uploadingFilesLimit = 5
   private var currentFile: FileHandle?

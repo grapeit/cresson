@@ -3,6 +3,7 @@
 #ref: https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/
 
 CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -v -o bin/cresson .
+[ $? -eq 0 ] || exit $?
 docker build -t cresson .
 
 #docker run --rm --network="host" --detach cresson
