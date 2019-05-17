@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FA012585227299D8004A648F /* Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA012584227299D8004A648F /* Conversion.swift */; };
+		FA122CFB228E714E0090D96A /* NetworkHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA122CFA228E714E0090D96A /* NetworkHelper.swift */; };
 		FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA31723E220E53440081DB6B /* AppDelegate.swift */; };
 		FA317241220E53440081DB6B /* DashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA317240220E53440081DB6B /* DashboardViewController.swift */; };
 		FA317244220E53440081DB6B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA317242220E53440081DB6B /* Main.storyboard */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		FA012584227299D8004A648F /* Conversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversion.swift; sourceTree = "<group>"; };
+		FA122CFA228E714E0090D96A /* NetworkHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkHelper.swift; sourceTree = "<group>"; };
 		FA31723B220E53440081DB6B /* cresson.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cresson.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA31723E220E53440081DB6B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA317240220E53440081DB6B /* DashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 				FA93BE71227BD6C5008AB1D8 /* Logger.swift */,
 				FA5C2B06227F613E001E9D83 /* DataCompression.swift */,
 				FA012584227299D8004A648F /* Conversion.swift */,
+				FA122CFA228E714E0090D96A /* NetworkHelper.swift */,
 				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
 				FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */,
@@ -163,6 +166,7 @@
 			files = (
 				FA93BE76227D3689008AB1D8 /* StatusViewController.swift in Sources */,
 				FA317241220E53440081DB6B /* DashboardViewController.swift in Sources */,
+				FA122CFB228E714E0090D96A /* NetworkHelper.swift in Sources */,
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
 				FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */,
 				FA012585227299D8004A648F /* Conversion.swift in Sources */,

@@ -126,13 +126,22 @@ private class UploadQueue {
   }
 
   private func upload() {
-    if !uploading && !suspended && !fileQueue.isEmpty {
-      uploading = true
-      upload(fileQueue.first!)
+    guard !uploading && !suspended && !fileQueue.isEmpty else {
+      return
     }
+    if !isConnectedToNetwork() {
+      print("UploadQueue.upload no connection")
+      uploadLater()
+      return
+    }
+    uploading = true
+    upload(fileQueue.first!)
   }
 
   private func uploadLater() {
+    if suspended {
+      return
+    }
     suspended = true
     execQueue.asyncAfter(deadline: .now() + retryInterval) {
       self.suspended = false
