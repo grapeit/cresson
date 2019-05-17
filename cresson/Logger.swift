@@ -1,51 +1,28 @@
 import Foundation
 
 
+private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
+private let fileNamePrefix = "data_feed-"
+private let fileNameSuffix = ".log"
+
+
+private extension String {
+  func fileIndex() -> Int? {
+    guard self.hasPrefix(fileNamePrefix) && self.hasSuffix(fileNameSuffix) else {
+      return nil
+    }
+    let begin = self.index(self.startIndex, offsetBy: fileNamePrefix.count)
+    let end = self.index(self.endIndex, offsetBy: -fileNameSuffix.count)
+    return Int(self[begin..<end])
+  }
+}
+
+
 class Logger {
-
-  private class UploadCounter {
-    private var counter = 0
-
-    func start() {
-      objc_sync_enter(self)
-      counter += 1
-      objc_sync_exit(self)
-    }
-
-    func startIfNotUploading() -> Bool {
-      objc_sync_enter(self)
-      let r = counter == 0
-      if r {
-        counter += 1
-      }
-      objc_sync_exit(self)
-      return r
-    }
-
-    func finish() {
-      objc_sync_enter(self)
-      counter -= 1
-      objc_sync_exit(self)
-    }
-  }
-
-
-  private struct ServerResponse: Decodable, Encodable {
-    let status: String
-    let error: String?
-  }
-
-
-  private let fileSizeLimit = 512 * 1024
-  private let fileNamePrefix = "data_feed-"
-  private let fileNameSuffix = ".log"
-  private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
-  //private let uploadService = URL(string: "http://10.0.0.250:2222/upload")!
-  private let uploadInterval = 60.0
-  private let uploadingFilesLimit = 5
+  private let fileSizeLimit = 256 * 1024
   private var currentFile: FileHandle?
-  private var uploadTimer: Timer?
-  private var uploadCounter = UploadCounter()
+  private var currentFileName: URL?
+  private var uploadQueue: UploadQueue?
 
 
   func log(_ registers: [BikeData.Register]) {
@@ -64,11 +41,17 @@ class Logger {
   }
 
   func initBackgoundUpload() {
-    uploadTimer = Timer.scheduledTimer(withTimeInterval: uploadInterval, repeats: true) { _ in
-      DispatchQueue.global(qos: .background).async {
-        self.upload()
-      }
+    DispatchQueue.global(qos: .background).async {
+      self.initUploadQueue()
     }
+  }
+
+  private func initUploadQueue() {
+    objc_sync_enter(self)
+    if self.uploadQueue == nil {
+      self.uploadQueue = UploadQueue()
+    }
+    objc_sync_exit(self)
   }
 
   private func log(_ entry: [String: Double]) {
@@ -79,23 +62,17 @@ class Logger {
     file.write(data)
     file.write("\n".data(using: .ascii)!)
     if file.offsetInFile >= fileSizeLimit {
+      uploadQueue!.push(file: currentFileName!)
       currentFile = nil
+      currentFileName = nil
     }
-  }
-
-  private func fileIndex(of fileName: String) -> Int? {
-    guard fileName.hasPrefix(fileNamePrefix) && fileName.hasSuffix(fileNameSuffix) else {
-      return nil
-    }
-    let begin = fileName.index(fileName.startIndex, offsetBy: fileNamePrefix.count)
-    let end = fileName.index(fileName.endIndex, offsetBy: -fileNameSuffix.count)
-    return Int(fileName[begin..<end])
   }
 
   private func getFileHandle() -> FileHandle? {
-    if currentFile != nil {
+    if currentFile != nil && currentFileName != nil && uploadQueue != nil {
       return currentFile
     }
+    initUploadQueue()
     guard var url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
       return nil
     }
@@ -104,7 +81,7 @@ class Logger {
     }
     var index = 0
     for f in files {
-      if let i = fileIndex(of: f), i > index {
+      if let i = f.fileIndex(), i > index {
         index = i
       }
     }
@@ -113,50 +90,98 @@ class Logger {
     url.appendPathComponent(fileName, isDirectory: false)
     FileManager.default.createFile(atPath: url.path, contents: nil)
     currentFile = try? FileHandle(forWritingTo: url)
+    currentFileName = currentFile != nil ? url : nil
     return currentFile
   }
+}
 
-  private func upload() {
-    guard uploadCounter.startIfNotUploading() else {
-      return
-    }
-    defer { uploadCounter.finish() }
+
+private class UploadQueue {
+  private let retryInterval = 5.0
+  private var fileQueue = [URL]()
+  private var uploading = false
+  private var suspended = false
+  private var execQueue: DispatchQueue
+
+
+  init() {
+    execQueue = DispatchQueue(label: "UploadQueue", qos: .background)
     guard let url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) else {
       return
     }
     guard let files = try? FileManager.default.contentsOfDirectory(atPath: url.path) else {
       return
     }
-    var toUpload = files.filter { fileIndex(of: $0) != nil }
-    guard toUpload.count > 1 else {
-      return
-    }
+    var toUpload = files.filter { $0.fileIndex() != nil }
     toUpload.sort { return $0.compare($1, options: .numeric) == .orderedAscending }
-    // excluding last file as it is a current log
-    for f in toUpload[..<min(toUpload.count - 1, uploadingFilesLimit)] {
-      upload(url.appendingPathComponent(f))
+    fileQueue = toUpload.map() { url.appendingPathComponent($0) }
+    uploadLater()
+  }
+
+  func push(file: URL) {
+    execQueue.sync {
+      fileQueue.append(file)
+      upload()
     }
+  }
+
+  private func upload() {
+    if !uploading && !suspended && !fileQueue.isEmpty {
+      uploading = true
+      upload(fileQueue.first!)
+    }
+  }
+
+  private func uploadLater() {
+    suspended = true
+    execQueue.asyncAfter(deadline: .now() + retryInterval) {
+      self.suspended = false
+      self.upload()
+    }
+  }
+
+  private func onUploadSucceed(_ file: URL) {
+    execQueue.sync {
+      print("UploadQueue.onUploadSucceed", file)
+      uploading = false
+      fileQueue.removeAll() { $0 == file }
+      upload()
+    }
+  }
+
+  private func onUploadError(_ file: URL, error: String) {
+    execQueue.sync {
+      print("UploadQueue.onUploadError", file, error)
+      uploading = false
+      uploadLater()
+    }
+  }
+
+  private struct ServerResponse: Decodable, Encodable {
+    let status: String
+    let error: String?
   }
 
   private func upload(_ file: URL) {
     guard let payload = try? Data(contentsOf: file), let compressed = payload.compressed() else {
+      onUploadError(file, error: "failed to load file") // discard file?
       return
     }
-    print("Logger.upload", file.path, payload.count, compressed.count)
+    print("UploadQueue.upload", file.path, payload.count, compressed.count)
     var request = URLRequest(url: uploadService)
     request.httpMethod = "POST"
     request.addValue("application/zlib", forHTTPHeaderField: "Content-Type")
     request.httpBody = compressed
-    uploadCounter.start()
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
-      defer { self.uploadCounter.finish() }
       guard error == nil, let data = data, let r = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
+        self.onUploadError(file, error: error != nil ? error.debugDescription : "")
         return
       }
       if r.status == "OK" {
         try? FileManager.default.removeItem(at: file)
+        self.onUploadSucceed(file)
       } else {
-        print("Logger.upload", String(data: try! JSONEncoder().encode(r), encoding: .utf8) ?? "")
+        self.onUploadError(file, error: String(data: try! JSONEncoder().encode(r), encoding: .utf8) ?? "")
       }
     }
     task.resume()
