@@ -1,7 +1,5 @@
 import UIKit
 
-let registerSaveInterval = 20.0
-
 
 class DashboardViewController: UIViewController {
 
@@ -10,7 +8,6 @@ class DashboardViewController: UIViewController {
 
   var btConnection = BtConnection()
   let bikeData = BikeData()
-  var saveTimer: Timer!
   var connected = false
 
 
@@ -21,9 +18,8 @@ class DashboardViewController: UIViewController {
     dataView.dataSource = self
     dataView.tableFooterView = UIView(frame: .zero)
     statusLabel.text = ""
-    saveTimer = Timer.scheduledTimer(withTimeInterval: registerSaveInterval, repeats: true) { _ in self.bikeData.save() }
-    NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
-    NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { _ in self.bikeData.save() }
+    NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() }
+    NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() }
     btConnection.delegate = self
     btConnection.start()
     bikeData.btConnection = btConnection
@@ -33,7 +29,8 @@ class DashboardViewController: UIViewController {
 extension DashboardViewController: BtConnectionDelegate {
   func status(_ status: String) {
     print(status)
-    if !btConnection.connected {
+    if connected && !btConnection.connected {
+      bikeData.onConnectionLost()
       connected = false
       dataView.reloadData()
     }

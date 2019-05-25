@@ -46,6 +46,14 @@ class Logger {
     }
   }
 
+  func upload() {
+    DispatchQueue.global(qos: .utility).async {
+      objc_sync_enter(self)
+      self.scheduleUpload()
+      objc_sync_exit(self)
+    }
+  }
+
   private func initUploadQueue() {
     objc_sync_enter(self)
     if self.uploadQueue == nil {
@@ -61,9 +69,7 @@ class Logger {
     file.write(data)
     file.write("\n".data(using: .ascii)!)
     if file.offsetInFile >= fileSizeLimit {
-      uploadQueue!.push(file: currentFileName!)
-      currentFile = nil
-      currentFileName = nil
+      scheduleUpload()
     }
   }
 
@@ -91,6 +97,15 @@ class Logger {
     currentFile = try? FileHandle(forWritingTo: url)
     currentFileName = currentFile != nil ? url : nil
     return currentFile
+  }
+
+  private func scheduleUpload() {
+    guard self.currentFile != nil && self.currentFileName != nil && self.uploadQueue != nil else {
+      return
+    }
+    uploadQueue!.push(file: currentFileName!)
+    currentFile = nil
+    currentFileName = nil
   }
 }
 

@@ -49,6 +49,8 @@ class BikeData {
 
   static var speedCompensation = 1.1 //TODO: empiric value, make it configurable
 
+  let registerSaveInterval = 20.0
+
   var registers = [Register]()
   var logger = Logger()
   var status = String()
@@ -56,18 +58,20 @@ class BikeData {
   var connected = false
   var mapToSend: Int?
   weak var btConnection: BtConnection?
+  var saveTimer: Timer!
 
 
   init() {
     time = Date().timeIntervalSinceReferenceDate
     for id in RegisterId.allCases {
-      if id.isLive(){
+      if id.isLive() {
         setRegister(Register(id: id, value: 0, timestamp: time))
       } else {
         loadRegister(id)
       }
     }
     logger.initBackgoundUpload()
+    saveTimer = Timer.scheduledTimer(withTimeInterval: registerSaveInterval, repeats: true) { [weak self] _ in self?.save() }
   }
 
   func save() {
@@ -101,6 +105,10 @@ class BikeData {
     }
     logger.log(registers)
     connected = data.status == "bike is connected"
+  }
+
+  func onConnectionLost() {
+    logger.upload()
   }
 
   func setRegisterFromUI(_ register: Register) {
