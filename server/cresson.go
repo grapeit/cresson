@@ -9,13 +9,11 @@ func main() {
 	initConfig()
 	initUpload()
 
-	var ginMode string
 	if config.Debug {
-		ginMode = gin.DebugMode
+		gin.SetMode(gin.DebugMode)
 	} else {
-		ginMode = gin.ReleaseMode
+		gin.SetMode(gin.ReleaseMode)
 	}
-	gin.SetMode(ginMode)
 	r := gin.Default()
 	r.POST("/upload", uploadHandler)
 	_ = r.Run(config.Listen)

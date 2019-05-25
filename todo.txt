@@ -1,4 +1,4 @@
-- handle local file write failures
+- enforce log upload when bike shuts off
 - debug case when app cannot find bluetooth device
 - status/configuration screen
 - adjustable speed error compensation

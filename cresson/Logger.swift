@@ -58,7 +58,6 @@ class Logger {
     guard let file = getFileHandle(), let data = try? JSONEncoder().encode(entry) else {
       return
     }
-    //QUESTION: does `write` throw? documentation says it does, compiler thinks otherwise
     file.write(data)
     file.write("\n".data(using: .ascii)!)
     if file.offsetInFile >= fileSizeLimit {
