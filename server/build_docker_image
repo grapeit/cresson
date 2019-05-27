@@ -2,6 +2,7 @@
 
 #ref: https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/
 
+go get github.com/gin-gonic/gin github.com/dgrijalva/jwt-go github.com/go-sql-driver/mysql
 CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -v -o bin/cresson .
 [ $? -eq 0 ] || exit $?
 docker build -t cresson .

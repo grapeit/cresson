@@ -47,10 +47,20 @@ func initSqlInsertPrefix() {
 }
 
 func uploadHandler(c *gin.Context) {
+	bikeId, err := verifyBike(c)
+	if err != nil {
+		if config.Debug {
+			fmt.Println("Verification error: ", err.Error())
+		}
+		c.JSON(403, gin.H{
+			"status": "failure",
+			"error": "unauthorized",
+		})
+		return
+	}
 	logReader := bufio.NewReader(flate.NewReader(c.Request.Body))
 	var sqlStatement strings.Builder
 	sqlStatement.WriteString(sqlInsertPrefix)
-	userId := "0"
 	firstRow := true
 	for {
 		line, err := logReader.ReadBytes('\n')
@@ -59,9 +69,12 @@ func uploadHandler(c *gin.Context) {
 				break
 			} else {
 				if config.Debug {
-					fmt.Println("Error: ", err.Error())
+					fmt.Println("Data read error: ", err.Error())
 				}
-				c.String(501, err.Error())
+				c.JSON(500, gin.H{
+					"status": "failure",
+					"error": "bad data",
+				})
 				return
 			}
 		}
@@ -76,7 +89,7 @@ func uploadHandler(c *gin.Context) {
 			sqlStatement.WriteByte(',')
 		}
 		sqlStatement.WriteByte('(')
-		sqlStatement.WriteString(userId)
+		sqlStatement.WriteString(strconv.Itoa(bikeId))
 		for _, i := range dataColumns {
 			sqlStatement.WriteByte(',')
 			sqlStatement.WriteString(strconv.FormatFloat(row[i], 'f', -1, 64))
@@ -94,7 +107,10 @@ func uploadHandler(c *gin.Context) {
 			if config.Debug {
 				fmt.Println("Error: ", err.Error())
 			}
-			c.String(501, err.Error())
+			c.JSON(500, gin.H{
+				"status": "failure",
+				"error": "database error",
+			})
 			return
 		}
 	} else {
@@ -104,7 +120,7 @@ func uploadHandler(c *gin.Context) {
 		}
 	}
 	c.JSON(200, gin.H{
-		"status": "OK",
+		"status": "ok",
 	})
 }
 

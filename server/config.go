@@ -7,6 +7,7 @@ import (
 
 type Configuration struct {
 	Listen          string `json:"listen"`
+	AuthSecret      string `json:"auth_secret"`
 	DbDriverName    string `json:"db_driver"`
 	DbConnectString string `json:"db_address"`
 	Debug           bool   `json:"debug"`

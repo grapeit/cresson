@@ -15,6 +15,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
+	r.GET("/authorize", authorizeHandler)
 	r.POST("/upload", uploadHandler)
 	_ = r.Run(config.Listen)
 }
