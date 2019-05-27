@@ -1,6 +1,7 @@
 #!/bin/bash
 
+CURRENT=$(docker ps -a -q --filter ancestor=cresson)
 ./build_docker_image
 [ $? -eq 0 ] || exit $?
-docker rm $(docker stop $(docker ps -a -q  --filter ancestor=cresson))
-docker run --network="host" --detach cresson
+docker stop $CURRENT
+docker run --rm --network="host" --detach cresson
