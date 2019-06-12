@@ -1,7 +1,7 @@
 import Foundation
 
 
-private let uploadService = URL(string: "http://cresson.the-grape.com/upload")!
+private let cressonService = URL(string: "http://cresson.the-grape.com")!
 private let fileNamePrefix = "data_feed-"
 private let fileNameSuffix = ".log"
 
@@ -116,6 +116,7 @@ private class UploadQueue {
   private var uploading = false
   private var suspended = false
   private var execQueue: DispatchQueue
+  private var authToken: String?
 
 
   init() {
@@ -163,11 +164,30 @@ private class UploadQueue {
     }
   }
 
+  private func onAuthSucceed(token: String) {
+    execQueue.sync {
+      print("UploadQueue.onAuthSucceed", token)
+      let newToken = authToken != token
+      authToken = token
+      uploading = false
+      newToken ? upload() : uploadLater()
+    }
+  }
+
+  private func onAuthError(error: String) {
+    execQueue.sync {
+      print("UploadQueue.onAuthError", error)
+      authToken = nil
+      uploading = false
+      uploadLater()
+    }
+  }
+
   private func onUploadSucceed(_ file: URL) {
     execQueue.sync {
       print("UploadQueue.onUploadSucceed", file)
-      uploading = false
       fileQueue.removeAll() { $0 == file }
+      uploading = false
       upload()
     }
   }
@@ -175,6 +195,9 @@ private class UploadQueue {
   private func onUploadError(_ file: URL, error: String) {
     execQueue.sync {
       print("UploadQueue.onUploadError", file, error)
+      if error == "unauthorized" {
+        authToken = nil
+      }
       uploading = false
       uploadLater()
     }
@@ -183,16 +206,22 @@ private class UploadQueue {
   private struct ServerResponse: Decodable, Encodable {
     let status: String
     let error: String?
+    let token: String?
   }
 
   private func upload(_ file: URL) {
+    guard let authToken = authToken else {
+      self.authorize()
+      return
+    }
     guard let payload = try? Data(contentsOf: file), let compressed = payload.compressed() else {
       onUploadError(file, error: "failed to load file") // discard file?
       return
     }
     print("UploadQueue.upload", file.path, payload.count, compressed.count)
-    var request = URLRequest(url: uploadService)
+    var request = URLRequest(url: cressonService.appendingPathComponent("upload"))
     request.httpMethod = "POST"
+    request.addValue("Bearer " + authToken, forHTTPHeaderField: "Authorization")
     request.addValue("application/zlib", forHTTPHeaderField: "Content-Type")
     request.httpBody = compressed
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -200,11 +229,28 @@ private class UploadQueue {
         self.onUploadError(file, error: error != nil ? error.debugDescription : "")
         return
       }
-      if r.status == "OK" {
+      if r.status == "ok" {
         try? FileManager.default.removeItem(at: file)
         self.onUploadSucceed(file)
       } else {
-        self.onUploadError(file, error: String(data: try! JSONEncoder().encode(r), encoding: .utf8) ?? "")
+        self.onUploadError(file, error: r.error ?? "")
+      }
+    }
+    task.resume()
+  }
+
+  private func authorize() {
+    var request = URLRequest(url: cressonService.appendingPathComponent("authorize"))
+    request.httpMethod = "GET"
+    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+      guard error == nil, let data = data, let r = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
+        self.onAuthError(error: error != nil ? error.debugDescription : "")
+        return
+      }
+      if r.status == "ok", let token = r.token {
+        self.onAuthSucceed(token: token)
+      } else {
+        self.onAuthError(error: r.error ?? "")
       }
     }
     task.resume()

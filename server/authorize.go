@@ -36,7 +36,7 @@ func authorizeHandler(c *gin.Context) {
 
 func verifyBike(c *gin.Context) (int, error) {
 	auth := strings.Split(c.GetHeader("Authorization"), " ")
-	if len(auth) != 2 || auth[0] != "Bearer" {
+	if len(auth) != 2 || !strings.EqualFold(auth[0], "Bearer") {
 		return 0, errors.New("bad auth method")
 	}
 	tokenString := auth[1]
