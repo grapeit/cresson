@@ -1,9 +1,9 @@
 - debug case when app cannot find bluetooth device
 - status/configuration screen
+- better status line
 - adjustable speed error compensation
 - adjust speedo/odo readings, check with GPS
-- better status line
-- multi-user/multi-bike support
 - data charts
+- multi-user/multi-bike support
 - speed up data feed
 - keep odometer on arduino, update when disconnected
