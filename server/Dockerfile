@@ -4,6 +4,6 @@ WORKDIR /
 
 ADD bin/cresson cresson.conf /
 
-EXPOSE 80
+EXPOSE 2424
 
 CMD ["/cresson"]
