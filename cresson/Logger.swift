@@ -1,7 +1,7 @@
 import Foundation
 
 
-private let cressonService = URL(string: "https://cresson.the-grape.com")!
+private let cressonService = URL(string: "https://api.cresson.the-grape.com")!
 private let fileNamePrefix = "data_feed-"
 private let fileNameSuffix = ".log"
 
