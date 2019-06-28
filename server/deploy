@@ -1,7 +1,18 @@
 #!/bin/bash
 
 CURRENT=$(docker ps -a -q --filter ancestor=cresson)
-./build_docker_image
-[ $? -eq 0 ] || exit $?
+
+# get config from home directory if exists
+'cp' cresson.conf cresson.conf.save
+'cp' ~/cresson.conf .
+
+docker build -t cresson .
+result=$?
+
+# restore config file
+mv -f cresson.conf.save cresson.conf
+
+[ $result -eq 0 ] || exit $?
+
 docker stop $CURRENT
 docker run --rm --network="host" --detach cresson
