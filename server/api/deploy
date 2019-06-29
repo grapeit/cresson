@@ -8,9 +8,9 @@ docker run --rm --detach \
     --name=cresson-api \
     --network=cresson-network \
     -p 2400:80 \
-    -e CRESSON_PORT=80 \
-    -e CRESSON_AUTH_SECRET \
-    -e CRESSON_DB_DRIVER \
-    -e CRESSON_DB_CONNECT \
-    -e CRESSON_DEBUG \
+    -e CRESSON_API_PORT=80 \
+    -e CRESSON_API_AUTH_SECRET \
+    -e CRESSON_API_DB_DRIVER \
+    -e CRESSON_API_DB_CONNECT \
+    -e CRESSON_API_DEBUG \
     cresson-api

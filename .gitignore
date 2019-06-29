@@ -5,4 +5,4 @@
 *.xcscmblueprint
 .DS_Store
 .idea
-server/bin/
+server/api/bin/
