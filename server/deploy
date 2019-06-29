@@ -5,13 +5,13 @@ CURRENT=$(docker ps -a -q --filter ancestor=cresson)
 docker build -t cresson .
 [ $? -eq 0 ] || exit $?
 
-docker stop $CURRENT
+[ -z "$CURRENT" ] || docker stop $CURRENT
 docker run --rm --detach \
-    -p 2424:80
+    -p 2424:80 \
     -e CRESSON_PORT=80 \
     -e CRESSON_AUTH_SECRET \
     -e CRESSON_DB_DRIVER \
     -e CRESSON_DB_CONNECT \
     -e CRESSON_DEBUG \
-    -v /var/lib/mysql/mysql.sock:/mysql.sock
+    -v /var/lib/mysql/mysql.sock:/mysql.sock \
     cresson
