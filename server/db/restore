@@ -1,4 +1,3 @@
 #!/bin/bash
 
-CURRENT=$(docker ps -a -q --filter ancestor=cresson-db)
-docker exec -i $CURRENT sh -c "exec mysql --user=root --password=\"$CRESSON_MYSQL_ROOT_PASSWORD\" cresson"
+./connect -i

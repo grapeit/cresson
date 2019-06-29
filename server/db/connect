@@ -1,3 +1,5 @@
 #!/bin/bash
 
-mysql --host=172.17.0.1 --port=2401 --user=root --password="$CRESSON_MYSQL_ROOT_PASSWORD" cresson
+MODE=$1
+[ -z "$MODE" ] && MODE=-it
+docker exec $MODE cresson-db sh -c "exec mysql --user=root --password=\"$CRESSON_MYSQL_ROOT_PASSWORD\" cresson"

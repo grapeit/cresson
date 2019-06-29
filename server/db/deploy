@@ -1,14 +1,13 @@
 #!/bin/bash
 
-CURRENT=$(docker ps -a -q --filter ancestor=cresson-db)
-
 docker build -t cresson-db .
 [ $? -eq 0 ] || exit $?
 
-[ -z "$CURRENT" ] || docker stop $CURRENT
+docker stop cresson-db
 mkdir -p /var/lib/cresson/mysql
 docker run --rm --detach \
-    -p 2401:3306 \
+    --name=cresson-db \
+    --network=cresson-network \
     -e MYSQL_ROOT_PASSWORD=$CRESSON_MYSQL_ROOT_PASSWORD \
     -v /var/lib/cresson/mysql:/var/lib/mysql \
     cresson-db

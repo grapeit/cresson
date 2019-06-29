@@ -1,5 +1,5 @@
 export CRESSON_MYSQL_ROOT_PASSWORD=your-mysql-password
 export CRESSON_AUTH_SECRET=your-auth-secret
 export CRESSON_DB_DRIVER=mysql
-export CRESSON_DB_CONNECT="root:$CRESSON_MYSQL_ROOT_PASSWORD@tcp(172.17.0.2:3306)/cresson"
+export CRESSON_DB_CONNECT="root:$CRESSON_MYSQL_ROOT_PASSWORD@tcp(cresson-db:3306)/cresson"
 export CRESSON_DEBUG=1
