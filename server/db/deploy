@@ -1,8 +1,5 @@
 #!/bin/bash
 
-docker build -t cresson-db .
-[ $? -eq 0 ] || exit $?
-
 docker stop cresson-db
 mkdir -p /var/lib/cresson/mysql
 docker run --rm --detach \
@@ -10,4 +7,5 @@ docker run --rm --detach \
     --network=cresson-network \
     -e MYSQL_ROOT_PASSWORD=$CRESSON_MYSQL_ROOT_PASSWORD \
     -v /var/lib/cresson/mysql:/var/lib/mysql \
-    cresson-db
+    -v $(pwd)/db.sql:/docker-entrypoint-initdb.d/db.sql \
+    mysql:5.6

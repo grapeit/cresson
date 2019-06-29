@@ -1,0 +1,9 @@
+#!/bin/bash
+
+docker stop cresson-php
+docker run --rm --detach \
+    -p 9000:9000 \
+    --name=cresson-php \
+    --network=cresson-network \
+    -v /var/lib/cresson/html:/var/lib/cresson/html \
+    php:7-fpm
