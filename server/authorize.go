@@ -17,9 +17,9 @@ func authorizeHandler(c *gin.Context) {
 		"bike": 1,
 		"exp": time.Now().Add(validityPeriod).Unix(),
 	})
-	tokenString, err := token.SignedString([]byte(config.AuthSecret))
+	tokenString, err := token.SignedString([]byte(config.authSecret))
 	if err != nil {
-		if config.Debug {
+		if config.debug {
 			fmt.Println("JWT error: ", err.Error())
 		}
 		c.JSON(500, gin.H{
@@ -44,7 +44,7 @@ func verifyBike(c *gin.Context) (int, error) {
 		if token.Method != jwtAlgorithm {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(config.AuthSecret), nil
+		return []byte(config.authSecret), nil
 	})
 	if err != nil {
 		return 0, err

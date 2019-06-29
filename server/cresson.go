@@ -9,7 +9,7 @@ func main() {
 	initConfig()
 	initUpload()
 
-	if config.Debug {
+	if config.debug {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -17,5 +17,5 @@ func main() {
 	r := gin.Default()
 	r.GET("/authorize", authorizeHandler)
 	r.POST("/upload", uploadHandler)
-	_ = r.Run(config.Listen)
+	_ = r.Run(config.listen)
 }

@@ -24,7 +24,7 @@ var dataColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolan
 var sqlInsertPrefix = ""
 
 func initUpload() {
-	db, err := sql.Open(config.DbDriverName, config.DbConnectString)
+	db, err := sql.Open(config.dbDriverName, config.dbConnectString)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -49,7 +49,7 @@ func initSqlInsertPrefix() {
 func uploadHandler(c *gin.Context) {
 	bikeId, err := verifyBike(c)
 	if err != nil {
-		if config.Debug {
+		if config.debug {
 			fmt.Println("Verification error: ", err.Error())
 		}
 		c.JSON(403, gin.H{
@@ -68,7 +68,7 @@ func uploadHandler(c *gin.Context) {
 			if err == io.EOF {
 				break
 			} else {
-				if config.Debug {
+				if config.debug {
 					fmt.Println("Data read error: ", err.Error())
 				}
 				c.JSON(500, gin.H{
@@ -100,11 +100,11 @@ func uploadHandler(c *gin.Context) {
 	res, err := database.Exec(sqlStatement.String());
 	if err != nil {
 		if isDuplicate(err) {
-			if config.Debug {
+			if config.debug {
 				fmt.Println("Already there")
 			}
 		} else {
-			if config.Debug {
+			if config.debug {
 				fmt.Println("Error: ", err.Error())
 			}
 			c.JSON(500, gin.H{
@@ -115,7 +115,7 @@ func uploadHandler(c *gin.Context) {
 		}
 	} else {
 		rows, _ := res.RowsAffected()
-		if config.Debug {
+		if config.debug {
 			fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin));
 		}
 	}

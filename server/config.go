@@ -1,29 +1,34 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"os"
 )
 
+var defaultPort = 80
+var defaultDbDriver = "mysql"
+
 type Configuration struct {
-	Listen          string `json:"listen"`
-	AuthSecret      string `json:"auth_secret"`
-	DbDriverName    string `json:"db_driver"`
-	DbConnectString string `json:"db_address"`
-	Debug           bool   `json:"debug"`
+	listen          string
+	authSecret      string
+	dbDriverName    string
+	dbConnectString string
+	debug           bool
 }
 var config Configuration
 
 
 func initConfig() {
-	configFile, err := os.Open("cresson.conf")
-	if err != nil {
-		panic(err.Error())
+	port := toInt(os.Getenv("CRESSON_PORT"))
+	if port == 0 {
+		port = defaultPort
 	}
-	jsonParser := json.NewDecoder(configFile)
-	err = jsonParser.Decode(&config)
-	_ = configFile.Close()
-	if err != nil {
-		panic(err.Error())
+	config.listen = fmt.Sprintf(":%d", port)
+	config.authSecret = os.Getenv("CRESSON_AUTH_SECRET")
+	config.dbDriverName = os.Getenv("CRESSON_DB_DRIVER")
+	if config.dbDriverName == "" {
+		config.dbDriverName = defaultDbDriver
 	}
+	config.dbConnectString = os.Getenv("CRESSON_DB_CONNECT")
+	config.debug = toInt(os.Getenv("CRESSON_DEBUG")) != 0
 }

@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 func toInt(v interface{}) int {
 	switch v.(type) {
 	case int:
@@ -18,6 +20,13 @@ func toInt(v interface{}) int {
 		return int(v.(uint32))
 	case uint:
 		return int(v.(uint))
+	case string:
+		v, e := strconv.Atoi(v.(string))
+		if e == nil {
+			return v
+		} else {
+			return 0
+		}
 	}
 	return 0
 }
