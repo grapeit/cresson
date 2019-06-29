@@ -1,17 +1,17 @@
 #!/bin/bash
 
-CURRENT=$(docker ps -a -q --filter ancestor=cresson)
+CURRENT=$(docker ps -a -q --filter ancestor=cresson-api)
 
-docker build -t cresson .
+docker build -t cresson-api .
 [ $? -eq 0 ] || exit $?
 
 [ -z "$CURRENT" ] || docker stop $CURRENT
 docker run --rm --detach \
-    -p 2424:80 \
+    -p 2400:80 \
     -e CRESSON_PORT=80 \
     -e CRESSON_AUTH_SECRET \
     -e CRESSON_DB_DRIVER \
     -e CRESSON_DB_CONNECT \
     -e CRESSON_DEBUG \
     -v /var/lib/mysql/mysql.sock:/mysql.sock \
-    cresson
+    cresson-api

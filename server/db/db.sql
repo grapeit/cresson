@@ -1,8 +1,5 @@
 CREATE DATABASE IF NOT EXISTS `cresson` CHARACTER SET utf8 COLLATE utf8_general_ci;
-
-GRANT USAGE ON cresson.* TO 'cresson'@'localhost' IDENTIFIED BY 'your-password';
-GRANT ALL PRIVILEGES ON cresson.* TO 'cresson'@'localhost';
-FLUSH PRIVILEGES;
+USE `cresson`;
 
 
 CREATE TABLE IF NOT EXISTS `users` (
