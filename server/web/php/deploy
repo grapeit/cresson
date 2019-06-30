@@ -1,9 +1,14 @@
 #!/bin/bash
 
+docker build -t cresson-php .
+
 docker stop cresson-php
 docker run --rm --detach \
     -p 9000:9000 \
     --name=cresson-php \
     --network=cresson-network \
+    -e CRESSON_MYSQL_HOST \
+    -e CRESSON_MYSQL_PORT \
+    -e CRESSON_MYSQL_ROOT_PASSWORD \
     -v /var/lib/cresson/html:/var/lib/cresson/html \
-    php:7-fpm
+    cresson-php
