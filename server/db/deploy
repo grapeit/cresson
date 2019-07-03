@@ -1,8 +1,9 @@
 #!/bin/bash
 
-docker stop cresson-db
+docker container stop cresson-db
+docker container rm cresson-db
 mkdir -p /var/lib/cresson/mysql
-docker run --rm --detach \
+docker run --detach --restart always \
     --name=cresson-db \
     --network=cresson-network \
     -e MYSQL_ROOT_PASSWORD=$CRESSON_MYSQL_ROOT_PASSWORD \

@@ -2,8 +2,9 @@
 
 docker build -t cresson-php .
 
-docker stop cresson-php
-docker run --rm --detach \
+docker container stop cresson-php
+docker container rm cresson-php
+docker run --detach --restart always \
     -p 9000:9000 \
     --name=cresson-php \
     --network=cresson-network \

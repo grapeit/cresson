@@ -3,8 +3,9 @@
 docker build -t cresson-api .
 [ $? -eq 0 ] || exit $?
 
-docker stop cresson-api
-docker run --rm --detach \
+docker container stop cresson-api
+docker container rm cresson-api
+docker run --detach --restart always \
     --name=cresson-api \
     --network=cresson-network \
     -p 2400:80 \
