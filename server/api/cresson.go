@@ -7,7 +7,7 @@ import (
 func main() {
 	// config must be initialized first
 	initConfig()
-	initUpload()
+	initDatabase()
 
 	if config.debug {
 		gin.SetMode(gin.DebugMode)
@@ -17,5 +17,6 @@ func main() {
 	r := gin.Default()
 	r.GET("/authorize", authorizeHandler)
 	r.POST("/upload", uploadHandler)
+	r.GET("/load", loadHandler)
 	_ = r.Run(config.listen)
 }

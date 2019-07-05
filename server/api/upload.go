@@ -3,42 +3,25 @@ package main
 import (
 	"bufio"
 	"compress/flate"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-sql-driver/mysql"
 	"io"
 	"strconv"
 	"strings"
 	"time"
 )
-import _ "github.com/go-sql-driver/mysql"
 
-const (
-	tableName = "data_log"
-	idColumn = "bike"
-)
-var database *sql.DB
-var dataColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
+var dataLogColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
 var sqlInsertPrefix = ""
 
-func initUpload() {
-	db, err := sql.Open(config.dbDriverName, config.dbConnectString)
-	if err != nil {
-		panic(err.Error())
-	}
-	database = db
-	initSqlInsertPrefix()
-}
-
-func initSqlInsertPrefix() {
+func init() {
 	var sb strings.Builder
 	sb.WriteString("INSERT INTO ")
-	sb.WriteString(tableName)
+	sb.WriteString(dataLogTable)
 	sb.WriteString(" (")
-	sb.WriteString(idColumn)
-	for _, i := range dataColumns {
+	sb.WriteString(dataLogIdColumn)
+	for _, i := range dataLogColumns {
 		sb.WriteByte(',')
 		sb.WriteString(i)
 	}
@@ -90,7 +73,7 @@ func uploadHandler(c *gin.Context) {
 		}
 		sqlStatement.WriteByte('(')
 		sqlStatement.WriteString(strconv.Itoa(bikeId))
-		for _, i := range dataColumns {
+		for _, i := range dataLogColumns {
 			sqlStatement.WriteByte(',')
 			sqlStatement.WriteString(strconv.FormatFloat(row[i], 'f', -1, 64))
 		}
@@ -99,13 +82,13 @@ func uploadHandler(c *gin.Context) {
 	dbBegin := time.Now()
 	res, err := database.Exec(sqlStatement.String());
 	if err != nil {
-		if isDuplicate(err) {
+		if isDuplicateError(err) {
 			if config.debug {
 				fmt.Println("Already there")
 			}
 		} else {
 			if config.debug {
-				fmt.Println("Error: ", err.Error())
+				fmt.Println("insert error: ", err.Error())
 			}
 			c.JSON(500, gin.H{
 				"status": "failure",
@@ -122,9 +105,4 @@ func uploadHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": "ok",
 	})
-}
-
-func isDuplicate(err error) bool {
-	mysqlerr, ok := err.(*mysql.MySQLError)
-	return ok && mysqlerr.Number == 1062
 }
