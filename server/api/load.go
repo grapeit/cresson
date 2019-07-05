@@ -23,7 +23,13 @@ func loadHandler(c *gin.Context) {
 		return
 	}
 	var timezoneOffsetSec = c.GetInt("tzos")
-	var resultRows []map[string]interface{}
+	resultCols := []map[string]interface{}{
+		{"label": "time", "type": "number"},
+		{"label": "speed", "type": "number"},
+		{"label": "battery", "type": "number"},
+	}
+	var resultRows [][]map[string]interface{}
+	var rowsCount = 0
 	for rows.Next() {
 		var (
 			ts float64
@@ -33,18 +39,22 @@ func loadHandler(c *gin.Context) {
 		if rows.Scan(&ts, &speed, &battery) != nil {
 			break
 		}
+		rowsCount += 1
 		ts -= float64(timezoneOffsetSec)
-		resultRows = append(resultRows, map[string]interface{}{
-			"ts": ts,
-			"speed": speed,
-			"battery": battery,
+		resultRows = append(resultRows, []map[string]interface{}{
+			{"v": ts, "f": time.Unix(int64(ts), 0).Format(time.Kitchen)},
+			{"v": speed},
+			{"v": battery},
 		})
 	}
 	c.JSON(200, gin.H{
 		"status": "success",
+		"cols": resultCols,
 		"rows": resultRows,
-		"zp" : map[string]interface{}{
-			"time_elapsed_secs": time.Now().Sub(dbBegin).Seconds(),
+		"z" : map[string]interface{}{
+			"timeElapsedSec": time.Now().Sub(dbBegin).Seconds(),
+			"timezoneOffsetSec": timezoneOffsetSec,
+			"rowsCount": rowsCount,
 		},
 	})
 }
