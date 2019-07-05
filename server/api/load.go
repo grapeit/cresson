@@ -10,8 +10,8 @@ func loadHandler(c *gin.Context) {
 	dbBegin := time.Now()
 	const startTs = 1560574800
 	const finishTs = 1560661200
-	const query = "SELECT ts, speed, battery FROM ? WHERE ts > ? AND ts < ?"
-	rows, err := database.Query(query, dataLogTable, startTs, finishTs)
+	const query = "SELECT ts, speed, battery FROM " + dataLogTable + " WHERE ts > ? AND ts < ?"
+	rows, err := database.Query(query, startTs, finishTs)
 	if err != nil {
 		if config.debug {
 			fmt.Println("select error: ", err.Error())
@@ -43,7 +43,7 @@ func loadHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": "success",
 		"rows": resultRows,
-		"p" : map[string]interface{}{
+		"zp" : map[string]interface{}{
 			"time_elapsed_secs": time.Now().Sub(dbBegin).Seconds(),
 		},
 	})
