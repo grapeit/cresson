@@ -22,13 +22,19 @@ func loadHandler(c *gin.Context) {
 		})
 		return
 	}
-	var timezoneOffsetSec = c.GetInt("tzos")
+
+	var timezoneOffsetSec = 0
+	tzos, tzosExists := c.Get("tzos")
+	if tzosExists {
+		timezoneOffsetSec = toInt(tzos);
+	}
+
 	resultCols := []map[string]interface{}{
 		{"label": "time", "type": "number"},
 		{"label": "speed", "type": "number"},
 		{"label": "battery", "type": "number"},
 	}
-	var resultRows [][]map[string]interface{}
+	var resultRows []map[string]interface{}
 	var rowsCount = 0
 	for rows.Next() {
 		var (
@@ -41,10 +47,12 @@ func loadHandler(c *gin.Context) {
 		}
 		rowsCount += 1
 		ts -= float64(timezoneOffsetSec)
-		resultRows = append(resultRows, []map[string]interface{}{
-			{"v": ts, "f": time.Unix(int64(ts), 0).Format(time.Kitchen)},
-			{"v": speed},
-			{"v": battery},
+		resultRows = append(resultRows, map[string]interface{}{
+			"c": []map[string]interface{}{
+				{"v": ts, "f": time.Unix(int64(ts), 0).Format(time.Kitchen)},
+				{"v": speed},
+				{"v": battery},
+			},
 		})
 	}
 	c.JSON(200, gin.H{
