@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,6 +16,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
+	r.Use(cors.Default())
 	r.GET("/authorize", authorizeHandler)
 	r.POST("/upload", uploadHandler)
 	r.GET("/load", loadHandler)
