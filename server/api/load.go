@@ -3,15 +3,37 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"strings"
 	"time"
 )
 
 func loadHandler(c *gin.Context) {
 	begin := time.Now()
+	var dataColumns = [...]string {"speed", "battery"}
 	const startTs = 1560574800
 	const finishTs = 1560661200
-	const query = "SELECT ts, speed, battery FROM " + dataLogTable + " WHERE ts > ? AND ts < ?"
-	rows, err := database.Query(query, startTs, finishTs)
+
+	resultCols := []map[string]interface{}{
+		{"label": "time", "type": "number"},
+	}
+	resultSeries := map[int]map[string]int{}
+	resultVAxis := 	map[int]map[string]string{}
+
+	var query strings.Builder
+	query.WriteString("SELECT ts")
+	for i, c := range dataColumns {
+		query.WriteString(", ")
+		query.WriteString(c)
+		resultCols = append(resultCols, map[string]interface{}{
+			"label": c, "type": "number",
+		})
+		resultSeries[i] = map[string]int { "targetAxisIndex": i }
+		resultVAxis[i] = map[string]string{ "title": c }
+	}
+	query.WriteString(" FROM ")
+	query.WriteString(dataLogTable)
+	query.WriteString(" WHERE ts > ? AND ts < ?")
+	rows, err := database.Query(query.String(), startTs, finishTs)
 	if err != nil {
 		if config.debug {
 			fmt.Println("select error: ", err.Error())
@@ -23,54 +45,46 @@ func loadHandler(c *gin.Context) {
 		return
 	}
 
-	var timezoneOffsetSec = toInt(c.Query("tzos"))
+	timezoneOffsetSec := float64(toInt(c.Query("tzos")))
 
-	resultCols := []map[string]interface{}{
-		{"label": "time", "type": "number"},
-		{"label": "speed", "type": "number"},
-		{"label": "battery", "type": "number"},
-	}
 	var resultRows []map[string]interface{}
-	var rowsCount = 0
 	for rows.Next() {
-		var (
-			ts float64
-			speed float64
-			battery float64
-		)
-		if rows.Scan(&ts, &speed, &battery) != nil {
+		vals := make([]interface{}, 1 + len(dataColumns))
+		if rows.Scan(vals...) != nil {
 			break
 		}
-		rowsCount += 1
-		ts -= float64(timezoneOffsetSec)
-		resultRows = append(resultRows, map[string]interface{}{
-			"c": []map[string]interface{}{
-				{"v": ts, "f": time.Unix(int64(ts), 0).Format(time.Kitchen)},
-				{"v": speed},
-				{"v": battery},
+		ts := vals[0].(float64)
+		rr := []map[string]interface{}{
+			{
+				"v": ts - timezoneOffsetSec,
+				"f": time.Unix(int64(ts), 0).Format(time.Kitchen),
 			},
-		})
+		}
+		for i, v := range vals {
+			if i == 0 {
+				continue
+			}
+			rr = append(rr, map[string]interface{}{ "v": v })
+		}
+		resultRows = append(resultRows, map[string]interface{}{ "c": rr })
 	}
+	ready := time.Now()
 	c.JSON(200, gin.H{
 		"status": "success",
 		"data": map[string]interface{}{
 			"cols": resultCols,
 			"rows": resultRows,
 		},
-		"series": map[int]map[string]int{
-			0: {"targetAxisIndex": 0},
-			1: {"targetAxisIndex": 1},
-		},
-		"vAxes": map[int]map[string]string{
-			0: {"title": "speed"},
-			1: {"title": "battery"},
+		"chart": map[string]interface{}{
+			"series": resultSeries,
+			"vAxes":  resultVAxis,
 		},
 		"z" : map[string]interface{}{
 			"timezoneOffsetSec": timezoneOffsetSec,
-			"rowsCount": rowsCount,
+			"rowsCount": len(resultRows),
 		},
 	})
 	if config.debug {
-		fmt.Println("loaded in ", time.Now().Sub(begin).Seconds())
+		fmt.Println("load timing: prepare = ", ready.Sub(begin).Seconds(), " done = ", time.Now().Sub(begin).Seconds())
 	}
 }
