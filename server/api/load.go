@@ -7,7 +7,7 @@ import (
 )
 
 func loadHandler(c *gin.Context) {
-	dbBegin := time.Now()
+	begin := time.Now()
 	const startTs = 1560574800
 	const finishTs = 1560661200
 	const query = "SELECT ts, speed, battery FROM " + dataLogTable + " WHERE ts > ? AND ts < ?"
@@ -23,11 +23,7 @@ func loadHandler(c *gin.Context) {
 		return
 	}
 
-	var timezoneOffsetSec = 0
-	tzos, tzosExists := c.Get("tzos")
-	if tzosExists {
-		timezoneOffsetSec = toInt(tzos);
-	}
+	var timezoneOffsetSec = toInt(c.Query("tzos"))
 
 	resultCols := []map[string]interface{}{
 		{"label": "time", "type": "number"},
@@ -57,12 +53,24 @@ func loadHandler(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{
 		"status": "success",
-		"cols": resultCols,
-		"rows": resultRows,
+		"data": map[string]interface{}{
+			"cols": resultCols,
+			"rows": resultRows,
+		},
+		"series": map[int]map[string]int{
+			0: {"targetAxisIndex": 0},
+			1: {"targetAxisIndex": 1},
+		},
+		"vAxes": map[int]map[string]string{
+			0: {"title": "speed"},
+			1: {"title": "battery"},
+		},
 		"z" : map[string]interface{}{
-			"timeElapsedSec": time.Now().Sub(dbBegin).Seconds(),
 			"timezoneOffsetSec": timezoneOffsetSec,
 			"rowsCount": rowsCount,
 		},
 	})
+	if config.debug {
+		fmt.Println("loaded in ", time.Now().Sub(begin).Seconds())
+	}
 }
