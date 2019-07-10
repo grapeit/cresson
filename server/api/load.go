@@ -7,11 +7,40 @@ import (
 	"time"
 )
 
+func getCols(cols string) []string {
+	var sc = strings.Split(cols, ",")
+	for _, sv := range sc {
+		var found = false
+		//TODO: consider using binary search optimization here
+		for _, v := range dataLogColumns {
+			if v == sv {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil
+		}
+	}
+	return sc
+}
+
 func loadHandler(c *gin.Context) {
 	begin := time.Now()
-	var dataColumns = [...]string {"speed", "battery"}
-	const startTs = 1560574800
-	const finishTs = 1560661200
+	var dataColumns = getCols(c.Query("cols"))
+	var fromTs = toInt(c.Query("from"))
+	var toTs = toInt(c.Query("to"))
+
+	if len(dataColumns) == 0 {
+		if config.debug {
+			fmt.Println("cols: ", dataColumns, " (", c.Query("cols"), ") from: ", fromTs, " to: ", toTs)
+		}
+		c.JSON(500, gin.H{
+			"status": "failure",
+			"error": "bad request",
+		})
+		return
+	}
 
 	resultCols := []map[string]interface{}{
 		{"label": "time", "type": "number"},
@@ -33,7 +62,7 @@ func loadHandler(c *gin.Context) {
 	query.WriteString(" FROM ")
 	query.WriteString(dataLogTable)
 	query.WriteString(" WHERE ts > ? AND ts < ?")
-	rows, err := database.Query(query.String(), startTs, finishTs)
+	rows, err := database.Query(query.String(), fromTs, toTs)
 	if err != nil {
 		if config.debug {
 			fmt.Println("select error: ", err.Error())
@@ -49,11 +78,17 @@ func loadHandler(c *gin.Context) {
 
 	var resultRows []map[string]interface{}
 	for rows.Next() {
+		rawResult := make([]float64, 1 + len(dataColumns))
 		vals := make([]interface{}, 1 + len(dataColumns))
-		if rows.Scan(vals...) != nil {
+		for i, _ := range rawResult {
+			vals[i] = &rawResult[i]
+		}
+		err := rows.Scan(vals...)
+		if err != nil {
+			fmt.Println("row error: ", err.Error())
 			break
 		}
-		ts := vals[0].(float64)
+		ts := *vals[0].(*float64)
 		rr := []map[string]interface{}{
 			{
 				"v": ts - timezoneOffsetSec,

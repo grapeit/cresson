@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-var dataLogColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
 var sqlInsertPrefix = ""
 
 func init() {
