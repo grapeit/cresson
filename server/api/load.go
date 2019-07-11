@@ -3,22 +3,27 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"sort"
 	"strings"
 	"time"
 )
 
+const maxLoadPeriodSec = 60 * 60 * 24 * 7
+
+var sortedDataLogColumns []string
+
 func getCols(cols string) []string {
+	if len(sortedDataLogColumns) == 0 {
+		sortedDataLogColumns = dataLogColumns
+		sort.Strings(sortedDataLogColumns)
+	}
 	var sc = strings.Split(cols, ",")
+	if len(sc) > len(sortedDataLogColumns) {
+		return nil
+	}
 	for _, sv := range sc {
-		var found = false
-		//TODO: consider using binary search optimization here
-		for _, v := range dataLogColumns {
-			if v == sv {
-				found = true
-				break
-			}
-		}
-		if !found {
+		i := sort.SearchStrings(sortedDataLogColumns, sv)
+		if i >= len(sortedDataLogColumns) || sortedDataLogColumns[i] != sv {
 			return nil
 		}
 	}
@@ -31,7 +36,7 @@ func loadHandler(c *gin.Context) {
 	var fromTs = toInt(c.Query("from"))
 	var toTs = toInt(c.Query("to"))
 
-	if len(dataColumns) == 0 {
+	if len(dataColumns) == 0 || toTs < fromTs || toTs - fromTs > maxLoadPeriodSec {
 		if config.debug {
 			fmt.Println("cols: ", dataColumns, " (", c.Query("cols"), ") from: ", fromTs, " to: ", toTs)
 		}
@@ -77,32 +82,40 @@ func loadHandler(c *gin.Context) {
 	timezoneOffsetSec := float64(toInt(c.Query("tzos")))
 
 	var resultRows []map[string]interface{}
+	minRealTs := float64(toTs)
+	maxRealTs := float64(fromTs)
 	for rows.Next() {
-		rawResult := make([]float64, 1 + len(dataColumns))
-		vals := make([]interface{}, 1 + len(dataColumns))
-		for i, _ := range rawResult {
-			vals[i] = &rawResult[i]
+		results := make([]float64, 1 + len(dataColumns))
+		scanParam := make([]interface{}, 1 + len(dataColumns))
+		for i, _ := range results {
+			scanParam[i] = &results[i]
 		}
-		err := rows.Scan(vals...)
+		err := rows.Scan(scanParam...)
 		if err != nil {
 			fmt.Println("row error: ", err.Error())
 			break
 		}
-		ts := *vals[0].(*float64)
+		ts := results[0] - timezoneOffsetSec
+		if minRealTs > ts {
+			minRealTs = ts
+		}
+		if maxRealTs < ts {
+			maxRealTs = ts
+		}
 		rr := []map[string]interface{}{
 			{
-				"v": ts - timezoneOffsetSec,
+				"v": ts,
 				"f": time.Unix(int64(ts), 0).Format(time.Kitchen),
 			},
 		}
-		for i, v := range vals {
-			if i == 0 {
-				continue
-			}
+		for _, v := range results[1:] {
 			rr = append(rr, map[string]interface{}{ "v": v })
 		}
 		resultRows = append(resultRows, map[string]interface{}{ "c": rr })
 	}
+
+	resultHAxisTicks := makeXAxisTicks(minRealTs, maxRealTs)
+
 	ready := time.Now()
 	c.JSON(200, gin.H{
 		"status": "success",
@@ -112,7 +125,10 @@ func loadHandler(c *gin.Context) {
 		},
 		"chart": map[string]interface{}{
 			"series": resultSeries,
-			"vAxes":  resultVAxis,
+			"vAxis":  resultVAxis,
+			"hAxis":  map[string]interface{}{
+				"ticks": resultHAxisTicks,
+			},
 		},
 		"z" : map[string]interface{}{
 			"timezoneOffsetSec": timezoneOffsetSec,
@@ -122,4 +138,31 @@ func loadHandler(c *gin.Context) {
 	if config.debug {
 		fmt.Println("load timing: prepare = ", ready.Sub(begin).Seconds(), " done = ", time.Now().Sub(begin).Seconds())
 	}
+}
+
+func makeXAxisTicks(from float64, to float64) []map[string]interface{} {
+	if from > to {
+		return nil
+	}
+	const ticks = 10.0
+	var result = []map[string]interface{}{
+		{
+			"v": from,
+			"f": time.Unix(int64(from), 0).Format(time.Kitchen),
+		},
+	}
+	scope := to - from
+	step := scope / ticks
+	start := from + step
+	for ts := start; ts < to; ts += step {
+		result = append(result, map[string]interface{}{
+			"v": ts,
+			"f": time.Unix(int64(ts), 0).Format(time.Kitchen),
+		})
+	}
+	result = append(result, map[string]interface{}{
+		"v": to,
+		"f": time.Unix(int64(to), 0).Format(time.Kitchen),
+	})
+	return result
 }

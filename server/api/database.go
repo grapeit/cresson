@@ -10,7 +10,7 @@ const (
 	dataLogTable = "data_log"
 	dataLogIdColumn = "bike"
 )
-var dataLogColumns = [...]string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
+var dataLogColumns = []string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
 
 var database *sql.DB
 
