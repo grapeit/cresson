@@ -79,7 +79,7 @@ func uploadHandler(c *gin.Context) {
 		sqlStatement.WriteByte(')')
 	}
 	dbBegin := time.Now()
-	res, err := database.Exec(sqlStatement.String());
+	res, err := database.Exec(sqlStatement.String())
 	if err != nil {
 		if isDuplicateError(err) {
 			if config.debug {
@@ -98,7 +98,7 @@ func uploadHandler(c *gin.Context) {
 	} else {
 		rows, _ := res.RowsAffected()
 		if config.debug {
-			fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin));
+			fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin))
 		}
 	}
 	c.JSON(200, gin.H{

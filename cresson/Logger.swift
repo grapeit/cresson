@@ -4,6 +4,7 @@ import Foundation
 private let cressonService = URL(string: "https://cresson-api.the-grape.com")!
 private let fileNamePrefix = "data_feed-"
 private let fileNameSuffix = ".log"
+private let timestampDupFix = 0.001
 
 
 private extension String {
@@ -23,19 +24,13 @@ class Logger {
   private var currentFile: FileHandle?
   private var currentFileName: URL?
   private var uploadQueue: UploadQueue?
+  private var lastTimestamp = 0.0
 
 
   func log(_ registers: [BikeData.Register]) {
-    var entry = [String: Double]()
-    for register in registers {
-      if let key = String(reflecting: register.id).components(separatedBy: ".").last {
-        entry[key] = register.normalize()
-      }
-    }
-    entry["ts"] = Date.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1970AndReferenceDate
     DispatchQueue.global(qos: .utility).async {
       objc_sync_enter(self)
-      self.log(entry)
+      self.writeLog(registers)
       objc_sync_exit(self)
     }
   }
@@ -62,7 +57,21 @@ class Logger {
     objc_sync_exit(self)
   }
 
-  private func log(_ entry: [String: Double]) {
+  private func writeLog(_ registers: [BikeData.Register]) {
+    var timestamp = Date.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1970AndReferenceDate
+    if timestamp <= lastTimestamp {
+      timestamp = lastTimestamp + timestampDupFix
+    }
+    lastTimestamp = timestamp
+
+    var entry = [String: Double]()
+    for register in registers {
+      if let key = String(reflecting: register.id).components(separatedBy: ".").last {
+        entry[key] = register.normalize()
+      }
+    }
+    entry["ts"] = timestamp
+
     guard let file = getFileHandle(), let data = try? JSONEncoder().encode(entry) else {
       return
     }
