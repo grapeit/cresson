@@ -6,7 +6,9 @@ mkdir -p /var/lib/cresson/mysql
 docker run --detach --restart always \
     --name=cresson-db \
     --network=cresson-network \
-    -e MYSQL_ROOT_PASSWORD=$CRESSON_MYSQL_ROOT_PASSWORD \
-    -v /var/lib/cresson/mysql:/var/lib/mysql \
-    -v $(pwd)/db.sql:/docker-entrypoint-initdb.d/db.sql \
-    mysql:5.6
+    --env MYSQL_ROOT_PASSWORD=$CRESSON_MYSQL_ROOT_PASSWORD \
+    --mount type=volume,source=cresson-db-vol,target=/var/lib/mysql \
+    --mount type=bind,source=$(pwd)/db.sql,target=/docker-entrypoint-initdb.d/db.sql \
+    --memory=2G \
+    mysql:5.7
+

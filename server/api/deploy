@@ -14,4 +14,5 @@ docker run --detach --restart always \
     -e CRESSON_API_DB_DRIVER \
     -e CRESSON_API_DB_CONNECT \
     -e CRESSON_API_DEBUG \
+    --memory=500m \
     cresson-api
