@@ -102,12 +102,7 @@ func loadHandler(c *gin.Context) {
 		if maxRealTs < ts {
 			maxRealTs = ts
 		}
-		rr := []map[string]interface{}{
-			{
-				"v": ts,
-				"f": time.Unix(int64(ts), 0).Format(time.Kitchen),
-			},
-		}
+		rr := []map[string]interface{}{ makeTimestampValue(ts) }
 		for _, v := range results[1:] {
 			rr = append(rr, map[string]interface{}{ "v": v })
 		}
@@ -145,24 +140,19 @@ func makeXAxisTicks(from float64, to float64) []map[string]interface{} {
 		return nil
 	}
 	const ticks = 10.0
-	var result = []map[string]interface{}{
-		{
-			"v": from,
-			"f": time.Unix(int64(from), 0).Format(time.Kitchen),
-		},
-	}
+	var values = []map[string]interface{}{ makeTimestampValue(from) }
 	scope := to - from
 	step := scope / ticks
 	start := from + step
 	for ts := start; ts < to; ts += step {
-		result = append(result, map[string]interface{}{
-			"v": ts,
-			"f": time.Unix(int64(ts), 0).Format(time.Kitchen),
-		})
+		values = append(values, makeTimestampValue(ts))
 	}
-	result = append(result, map[string]interface{}{
-		"v": to,
-		"f": time.Unix(int64(to), 0).Format(time.Kitchen),
-	})
-	return result
+	return append(values, makeTimestampValue(to))
+}
+
+func makeTimestampValue(timestamp float64) map[string]interface{} {
+	return map[string]interface{}{
+		"v": timestamp,
+		"f": time.Unix(int64(timestamp), 0).Format(time.Kitchen),
+	}
 }
