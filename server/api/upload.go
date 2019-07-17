@@ -74,10 +74,11 @@ func uploadHandler(c *gin.Context) {
 		sqlStatement.WriteByte(')')
 	}
 	dbBegin := time.Now()
-	res, err := database.Exec(sqlStatement.String())
+	request := sqlStatement.String()
+	res, err := database.Exec(request)
 	if err != nil {
 		if isDuplicateError(err) {
-			logDebug("already there")
+			logWarning("already there:", request)
 		} else {
 			logError("INSERT error: ", err.Error())
 			c.JSON(500, gin.H{
