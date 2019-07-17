@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"compress/flate"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"strconv"
@@ -31,9 +30,7 @@ func init() {
 func uploadHandler(c *gin.Context) {
 	bikeId, err := verifyBike(c)
 	if err != nil {
-		if config.debug {
-			fmt.Println("Verification error: ", err.Error())
-		}
+		logWarning("verification error:", err.Error())
 		c.JSON(403, gin.H{
 			"status": "failure",
 			"error": "unauthorized",
@@ -50,9 +47,7 @@ func uploadHandler(c *gin.Context) {
 			if err == io.EOF {
 				break
 			} else {
-				if config.debug {
-					fmt.Println("Data read error: ", err.Error())
-				}
+				logWarning("data read error:", err.Error())
 				c.JSON(500, gin.H{
 					"status": "failure",
 					"error": "bad data",
@@ -82,13 +77,9 @@ func uploadHandler(c *gin.Context) {
 	res, err := database.Exec(sqlStatement.String())
 	if err != nil {
 		if isDuplicateError(err) {
-			if config.debug {
-				fmt.Println("Already there")
-			}
+			logDebug("already there")
 		} else {
-			if config.debug {
-				fmt.Println("insert error: ", err.Error())
-			}
+			logError("INSERT error: ", err.Error())
 			c.JSON(500, gin.H{
 				"status": "failure",
 				"error": "database error",
@@ -97,9 +88,7 @@ func uploadHandler(c *gin.Context) {
 		}
 	} else {
 		rows, _ := res.RowsAffected()
-		if config.debug {
-			fmt.Println("Rows affected: ", rows, "in", time.Now().Sub(dbBegin))
-		}
+		logDebug("rows affected:", rows, "in", time.Now().Sub(dbBegin))
 	}
 	c.JSON(200, gin.H{
 		"status": "ok",

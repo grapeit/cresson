@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"sort"
 	"strings"
@@ -32,14 +31,17 @@ func getCols(cols string) []string {
 
 func loadHandler(c *gin.Context) {
 	begin := time.Now()
-	var dataColumns = getCols(c.Query("cols"))
+	var requestedColumns = c.Query("cols")
+	var dataColumns = getCols(requestedColumns)
 	var fromTs = toInt(c.Query("from"))
 	var toTs = toInt(c.Query("to"))
 
 	if len(dataColumns) == 0 || toTs < fromTs || toTs - fromTs > maxLoadPeriodSec {
-		if config.debug {
-			fmt.Println("cols: ", dataColumns, " (", c.Query("cols"), ") from: ", fromTs, " to: ", toTs)
-		}
+		logWarning("invalid request", "|",
+			"columns:", dataColumns, "|",
+			"requested columns:", requestedColumns, "|",
+			"from:", fromTs, "|",
+			"to:", toTs)
 		c.JSON(500, gin.H{
 			"status": "failure",
 			"error": "bad request",
@@ -69,9 +71,7 @@ func loadHandler(c *gin.Context) {
 	query.WriteString(" WHERE ts > ? AND ts < ?")
 	rows, err := database.Query(query.String(), fromTs, toTs)
 	if err != nil {
-		if config.debug {
-			fmt.Println("select error: ", err.Error())
-		}
+		logError("SELECT error:", err.Error())
 		c.JSON(500, gin.H{
 			"status": "failure",
 			"error": "database error",
@@ -92,7 +92,7 @@ func loadHandler(c *gin.Context) {
 		}
 		err := rows.Scan(scanParam...)
 		if err != nil {
-			fmt.Println("row error: ", err.Error())
+			logError("row scan error:", err.Error())
 			break
 		}
 		ts := results[0] - timezoneOffsetSec
@@ -130,9 +130,9 @@ func loadHandler(c *gin.Context) {
 			"rowsCount": len(resultRows),
 		},
 	})
-	if config.debug {
-		fmt.Println("load timing: prepare = ", ready.Sub(begin).Seconds(), " done = ", time.Now().Sub(begin).Seconds())
-	}
+	logDebug("load timing", "|",
+		"prepare:", ready.Sub(begin).Seconds(), "|",
+		"total:", time.Now().Sub(begin).Seconds())
 }
 
 func makeXAxisTicks(from float64, to float64) []map[string]interface{} {

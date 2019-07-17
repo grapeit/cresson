@@ -19,9 +19,7 @@ func authorizeHandler(c *gin.Context) {
 	})
 	tokenString, err := token.SignedString([]byte(config.authSecret))
 	if err != nil {
-		if config.debug {
-			fmt.Println("JWT error: ", err.Error())
-		}
+		logError("JWT error:", err.Error())
 		c.JSON(500, gin.H{
 			"status": "failure",
 			"error": "unexpected error",
