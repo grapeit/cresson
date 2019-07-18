@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const validityPeriod = 31 * 24 * time.Hour
+const validityPeriod = 30 * 24 * time.Hour
 var jwtAlgorithm = jwt.SigningMethodHS512
 
 func authorizeHandler(c *gin.Context) {

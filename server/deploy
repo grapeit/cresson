@@ -1,1 +1,4 @@
-docker-compose --project-name cresson up -d
+PROJECT=cresson
+
+docker-compose --project-name $PROJECT build
+docker-compose --project-name $PROJECT up -d
