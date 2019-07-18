@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	// config must be initialized first
-	initConfig()
+	initConfig()   // config must be initialized first
 	initDatabase()
+	initUpload()   // initialize upload after database
 
 	if config.debug {
 		gin.SetMode(gin.DebugMode)

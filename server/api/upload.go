@@ -13,7 +13,7 @@ import (
 
 var sqlInsertPrefix = ""
 
-func init() {
+func initUpload() {
 	var sb strings.Builder
 	sb.WriteString("INSERT INTO ")
 	sb.WriteString(dataLogTable)
