@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
+	"sort"
 )
 import _ "github.com/go-sql-driver/mysql"
 
@@ -10,11 +11,15 @@ const (
 	dataLogTable = "data_log"
 	dataLogIdColumn = "bike"
 )
-var dataLogColumns = []string {"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer"}
+
+var dataLogColumnsSorted = []string {
+	"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer",
+}
 
 var database *sql.DB
 
 func initDatabase() {
+	sort.Strings(dataLogColumnsSorted)
 	db, err := sql.Open(config.dbDriverName, config.dbConnectString)
 	if err != nil {
 		panic(err.Error())

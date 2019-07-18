@@ -19,9 +19,9 @@ func init() {
 	sb.WriteString(dataLogTable)
 	sb.WriteString(" (")
 	sb.WriteString(dataLogIdColumn)
-	for i := 0; i < len(dataLogColumns); i++ {
+	for _, i := range dataLogColumnsSorted {
 		sb.WriteByte(',')
-		sb.WriteString(dataLogColumns[i])
+		sb.WriteString(i)
 	}
 	sb.WriteString(") VALUES ")
 	sqlInsertPrefix = sb.String()
@@ -67,9 +67,9 @@ func uploadHandler(c *gin.Context) {
 		}
 		sqlStatement.WriteByte('(')
 		sqlStatement.WriteString(strconv.Itoa(bikeId))
-		for i := 0; i < len(dataLogColumns); i++ {
+		for _, i := range dataLogColumnsSorted {
 			sqlStatement.WriteByte(',')
-			sqlStatement.WriteString(strconv.FormatFloat(row[dataLogColumns[i]], 'f', -1, 64))
+			sqlStatement.WriteString(strconv.FormatFloat(row[i], 'f', -1, 64))
 		}
 		sqlStatement.WriteByte(')')
 	}
@@ -80,7 +80,7 @@ func uploadHandler(c *gin.Context) {
 		if isDuplicateError(err) {
 			logWarning("already there:", request)
 		} else {
-			logError("INSERT error: ", err.Error())
+			logError("INSERT error:", err.Error())
 			c.JSON(500, gin.H{
 				"status": "failure",
 				"error": "database error",

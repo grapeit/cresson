@@ -9,20 +9,14 @@ import (
 
 const maxLoadPeriodSec = 60 * 60 * 24 * 7
 
-var sortedDataLogColumns []string
-
 func getCols(cols string) []string {
-	if len(sortedDataLogColumns) == 0 {
-		sortedDataLogColumns = dataLogColumns
-		sort.Strings(sortedDataLogColumns)
-	}
 	var sc = strings.Split(cols, ",")
-	if len(sc) > len(sortedDataLogColumns) {
+	if len(sc) > len(dataLogColumnsSorted) {
 		return nil
 	}
 	for _, sv := range sc {
-		i := sort.SearchStrings(sortedDataLogColumns, sv)
-		if i >= len(sortedDataLogColumns) || sortedDataLogColumns[i] != sv {
+		i := sort.SearchStrings(dataLogColumnsSorted, sv)
+		if i >= len(dataLogColumnsSorted) || dataLogColumnsSorted[i] != sv {
 			return nil
 		}
 	}

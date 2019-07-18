@@ -15,6 +15,7 @@ var jwtAlgorithm = jwt.SigningMethodHS512
 func authorizeHandler(c *gin.Context) {
 	token := jwt.NewWithClaims(jwtAlgorithm, jwt.MapClaims{
 		"bike": 1,
+		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(validityPeriod).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(config.authSecret))
