@@ -1,4 +1,4 @@
-PROJECT=cresson
-
-docker-compose --project-name $PROJECT build
-docker-compose --project-name $PROJECT up -d
+docker network create cresson-network
+docker volume create cresson-db-vol
+docker-compose build
+docker-compose up -d

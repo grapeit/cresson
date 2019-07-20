@@ -1,12 +1,13 @@
-version: '3'
+version: '2'
 
 services:
   api:
     build: ./api
+    image: cresson-api
     container_name: cresson-api
     hostname: cresson-api
     networks:
-      - network
+      - cresson-network
     ports:
       - "2400:80/tcp"
     environment:
@@ -15,21 +16,25 @@ services:
       - CRESSON_API_DB_DRIVER
       - CRESSON_API_DB_CONNECT
       - CRESSON_API_DEBUG
+    mem_limit: 500M
 
   db:
     image: mysql:5.7
     container_name: cresson-db
     hostname: cresson-db
     networks:
-      - network
+      - cresson-network
     environment:
       - MYSQL_ROOT_PASSWORD=${CRESSON_MYSQL_ROOT_PASSWORD}
     volumes:
-      - db-vol:/var/lib/mysql
+      - cresson-db-vol:/var/lib/mysql
       - ./db/db.sql:/docker-entrypoint-initdb.d/db.sql
+    mem_limit: 1G
 
 volumes:
-  db-vol:
+  cresson-db-vol:
+    external: true
 
 networks:
-  network:
+  cresson-network:
+    external: true

@@ -9,6 +9,6 @@ docker run --detach --restart always \
     --env MYSQL_ROOT_PASSWORD=$CRESSON_MYSQL_ROOT_PASSWORD \
     --mount type=volume,source=cresson-db-vol,target=/var/lib/mysql \
     --mount type=bind,source=$(pwd)/db.sql,target=/docker-entrypoint-initdb.d/db.sql \
-    --memory=2G \
+    --memory=1G \
     mysql:5.7
 
