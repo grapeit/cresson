@@ -15,6 +15,7 @@ var sqlInsertPrefix = ""
 
 func init() {
 	addRequestHandler(func (e *gin.Engine) {
+		initUpload()
 		e.POST("/upload", uploadHandler)
 	})
 }

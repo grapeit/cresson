@@ -14,7 +14,6 @@ func addRequestHandler(f func(*gin.Engine)) {
 func main() {
 	initConfig()   // config must be initialized first
 	initDatabase()
-	initUpload()   // initialize upload after database
 
 	if config.debug {
 		gin.SetMode(gin.DebugMode)
