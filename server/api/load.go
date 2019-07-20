@@ -9,6 +9,12 @@ import (
 
 const maxLoadPeriodSec = 60 * 60 * 24 * 7
 
+func init() {
+	addRequestHandler(func (e *gin.Engine) {
+		e.GET("/load", loadHandler)
+	})
+}
+
 func getCols(cols string) []string {
 	var sc = strings.Split(cols, ",")
 	if len(sc) > len(dataLogColumnsSorted) {

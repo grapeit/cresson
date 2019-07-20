@@ -13,6 +13,12 @@ import (
 
 var sqlInsertPrefix = ""
 
+func init() {
+	addRequestHandler(func (e *gin.Engine) {
+		e.POST("/upload", uploadHandler)
+	})
+}
+
 func initUpload() {
 	var sb strings.Builder
 	sb.WriteString("INSERT INTO ")

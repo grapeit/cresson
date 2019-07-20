@@ -5,6 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var requestHandlers = []func(*gin.Engine) {}
+
+func addRequestHandler(f func(*gin.Engine)) {
+	requestHandlers = append(requestHandlers, f)
+}
+
 func main() {
 	initConfig()   // config must be initialized first
 	initDatabase()
@@ -17,8 +23,8 @@ func main() {
 	}
 	r := gin.Default()
 	r.Use(cors.Default())
-	r.GET("/authorize", authorizeHandler)
-	r.POST("/upload", uploadHandler)
-	r.GET("/load", loadHandler)
+	for _, i := range requestHandlers {
+		i(r)
+	}
 	_ = r.Run(config.listen)
 }

@@ -12,6 +12,12 @@ import (
 const validityPeriod = 30 * 24 * time.Hour
 var jwtAlgorithm = jwt.SigningMethodHS512
 
+func init() {
+	addRequestHandler(func (e *gin.Engine) {
+		e.GET("/authorize", authorizeHandler)
+	})
+}
+
 func authorizeHandler(c *gin.Context) {
 	token := jwt.NewWithClaims(jwtAlgorithm, jwt.MapClaims{
 		"bike": 1,
