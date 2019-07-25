@@ -1,6 +1,7 @@
 #!/bin/bash
 
 docker build -f Dockerfile.builder -t cresson-api-builder .
+[ $? -eq 0 ] || exit $?
 docker build -t cresson-api .
 [ $? -eq 0 ] || exit $?
 
