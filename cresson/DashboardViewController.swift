@@ -24,6 +24,11 @@ class DashboardViewController: UIViewController {
     btConnection.start()
     bikeData.btConnection = btConnection
   }
+
+  private func onConnectionStatusChanged() {
+    UIApplication.shared.isIdleTimerDisabled = connected
+    dataView.reloadData()
+  }
 }
 
 extension DashboardViewController: BtConnectionDelegate {
@@ -32,7 +37,7 @@ extension DashboardViewController: BtConnectionDelegate {
     if connected && !btConnection.connected {
       bikeData.onConnectionLost()
       connected = false
-      dataView.reloadData()
+      onConnectionStatusChanged()
     }
     statusLabel.text = status
   }
@@ -46,7 +51,7 @@ extension DashboardViewController: BtConnectionDelegate {
     }
     if connected != bikeData.connected {
       connected = bikeData.connected
-      dataView.reloadData()
+      onConnectionStatusChanged()
     }
     statusLabel.text = bikeData.status
   }
