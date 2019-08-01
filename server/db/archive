@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./dump | gzip > cresson-$(date -I).sql.gz
