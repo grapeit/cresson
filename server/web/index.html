@@ -1,0 +1,52 @@
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        // Load the Visualization API and the piechart package.
+        google.charts.load('current', {'packages':['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            let timezone_offset_minutes = new Date().getTimezoneOffset();
+            let fromTs = 1560574800;
+            let toTs = 1560661200;
+            let cols = "speed,battery";
+            let dataUrl = "https://cresson-api.the-grape.com/load?tzos=" + timezone_offset_minutes * 60;
+            dataUrl += "&from=" + fromTs;
+            dataUrl += "&to=" + toTs;
+            dataUrl += "&cols=" + cols;
+            let loadedData = JSON.parse($.ajax({
+                url: dataUrl,
+                dataType: "json",
+                async: false
+            }).responseText);
+
+            // Create our data table out of JSON data loaded from server.
+            let data = new google.visualization.DataTable(loadedData.data);
+
+            let options = {
+                width: 1400,
+                height: 600,
+                series: loadedData.chart.series,
+                vAxis: loadedData.chart.vAxis,
+                hAxis: loadedData.chart.hAxis
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            let chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+
+    </script>
+</head>
+
+<body>
+<!--Div that will hold the pie chart-->
+<div id="chart_div"></div>
+</body>
+</html>
