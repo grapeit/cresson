@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -11,7 +12,50 @@ const maxLoadPeriodSec = 60 * 60 * 24 * 7
 
 func init() {
 	addRequestHandler(func (e *gin.Engine) {
+		e.GET("/active-days", activeDaysHandler)
 		e.GET("/load", loadHandler)
+	})
+}
+
+func activeDaysHandler(c *gin.Context) {
+	timezoneOffsetSec := toInt(c.Query("tzos"))
+	query := "SELECT DATE(FROM_UNIXTIME(ts - ?)) d, MIN(ts), MAX(ts), COUNT(ts) FROM data_log WHERE rpm > 0 GROUP BY d"
+	rows, err := database.Query(query, timezoneOffsetSec)
+	if err != nil {
+		logError("activeDaysHandler query error:", err.Error())
+		c.JSON(500, gin.H{
+			"status": "failure",
+			"error": "database error",
+		})
+		return
+	}
+	var (
+		activeDays []map[string]interface{}
+		date string
+		minTs float64
+		maxTs float64
+		count int
+	)
+	for rows.Next() {
+		err := rows.Scan(&date, &minTs, &maxTs, &count)
+		if err != nil {
+			logError("activeDaysHandler row scan error:", err.Error())
+			c.JSON(500, gin.H{
+				"status": "failure",
+				"error": "database error",
+			})
+			return
+		}
+		activeDays = append(activeDays, map[string]interface{}{
+			"date": date,
+			"from": math.Floor(minTs),
+			"to": math.Ceil(maxTs),
+			"records": count,
+		})
+	}
+	c.JSON(200, gin.H{
+		"status": "success",
+		"days": activeDays,
 	})
 }
 
@@ -68,10 +112,10 @@ func loadHandler(c *gin.Context) {
 	}
 	query.WriteString(" FROM ")
 	query.WriteString(dataLogTable)
-	query.WriteString(" WHERE ts > ? AND ts < ?")
+	query.WriteString(" WHERE ts >= ? AND ts <= ?")
 	rows, err := database.Query(query.String(), fromTs, toTs)
 	if err != nil {
-		logError("SELECT error:", err.Error())
+		logError("loadHandler query error:", err.Error())
 		c.JSON(500, gin.H{
 			"status": "failure",
 			"error": "database error",
@@ -92,8 +136,12 @@ func loadHandler(c *gin.Context) {
 		}
 		err := rows.Scan(scanParam...)
 		if err != nil {
-			logError("row scan error:", err.Error())
-			break
+			logError("loadHandler row scan error:", err.Error())
+			c.JSON(500, gin.H{
+				"status": "failure",
+				"error": "database error",
+			})
+			return
 		}
 		ts := results[0] - timezoneOffsetSec
 		if minRealTs > ts {
