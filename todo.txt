@@ -1,3 +1,4 @@
+- debug case when app cannot find bluetooth device
 - status/configuration screen
 - better status line
 - adjustable speed error compensation
