@@ -1,6 +1,5 @@
 import Foundation
 
-
 extension Double {
   func m2mm() -> Double {
     return self * 1000.0

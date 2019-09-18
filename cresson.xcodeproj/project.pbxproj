@@ -98,6 +98,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FA31724D220E53460081DB6B /* Build configuration list for PBXNativeTarget "cresson" */;
 			buildPhases = (
+				FAF294B12331BA9100B5208D /* ShellScript */,
 				FA317237220E53440081DB6B /* Sources */,
 				FA317238220E53440081DB6B /* Frameworks */,
 				FA317239220E53440081DB6B /* Resources */,
@@ -158,6 +159,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FAF294B12331BA9100B5208D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FA317237220E53440081DB6B /* Sources */ = {

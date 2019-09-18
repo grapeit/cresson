@@ -1,6 +1,5 @@
 import UIKit
 
-
 class DashboardViewController: UIViewController {
 
   @IBOutlet weak var dataView: UITableView!
@@ -9,7 +8,7 @@ class DashboardViewController: UIViewController {
   var btConnection = BtConnection()
   let bikeData = BikeData()
   var connected = false
-
+  var observers = [Any]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -18,11 +17,17 @@ class DashboardViewController: UIViewController {
     dataView.dataSource = self
     dataView.tableFooterView = UIView(frame: .zero)
     statusLabel.text = ""
-    NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() }
-    NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() }
+    observers.append(NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() })
+    observers.append(NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() })
     btConnection.delegate = self
     btConnection.start()
     bikeData.btConnection = btConnection
+  }
+
+  deinit {
+    for observer in observers {
+      NotificationCenter.default.removeObserver(observer)
+    }
   }
 
   private func onConnectionStatusChanged() {
@@ -44,9 +49,9 @@ extension DashboardViewController: BtConnectionDelegate {
 
   func update(_ data: BikeUpdate) {
     bikeData.update(data)
-    for c in dataView.visibleCells {
-      if let c = c as? RegisterTableViewCell, let id = c.registerId, let r = bikeData.getRegister(id) {
-        c.setRegister(r, connected: connected)
+    for cell in dataView.visibleCells {
+      if let cell = cell as? RegisterTableViewCell, let id = cell.registerId, let register = bikeData.getRegister(id) {
+        cell.setRegister(register, connected: connected)
       }
     }
     if connected != bikeData.connected {
@@ -74,7 +79,7 @@ extension DashboardViewController: UITableViewDelegate {
   }
 
   private func reset(register: BikeData.RegisterId, at indexPath: IndexPath) -> UIContextualAction {
-    let action = UIContextualAction(style: .normal, title: "Reset") { (action, view, completion) in
+    let action = UIContextualAction(style: .normal, title: "Reset") { (_, _, completion) in
       self.bikeData.resetRegisterFromUI(register)
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
@@ -86,7 +91,7 @@ extension DashboardViewController: UITableViewDelegate {
   private func switchMap(at indexPath: IndexPath) -> UIContextualAction {
     let current = bikeData.getRegister(.map)?.value ?? 0
     let next = current == 1 ? 2 : 1
-    return UIContextualAction(style: .normal, title: "\(next)") { (action, view, completion) in
+    return UIContextualAction(style: .normal, title: "\(next)") { (_, _, completion) in
       self.bikeData.setRegisterFromUI(BikeData.Register(id: .map, value: next, timestamp: Date().timeIntervalSinceReferenceDate))
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)

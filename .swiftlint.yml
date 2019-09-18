@@ -1,0 +1,27 @@
+disabled_rules:
+  - todo
+opt_in_rules:
+included:
+  - cresson
+excluded:
+
+line_length: 360
+
+type_name:
+  min_length: 4
+  max_length:
+    warning: 40
+    error: 50
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - i
+    - j
+
+nesting:
+  type_level: 2
+
+function_body_length: 50
+
+reporter: "xcode"

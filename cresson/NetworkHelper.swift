@@ -1,7 +1,6 @@
 import Foundation
 import SystemConfiguration
 
-
 func isConnectedToNetwork() -> Bool {
   var zeroAddress = sockaddr_in()
   zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
@@ -24,4 +23,3 @@ func isConnectedToNetwork() -> Bool {
   let needsConnection = flags.contains(.connectionRequired)
   return isReachable && !needsConnection
 }
-

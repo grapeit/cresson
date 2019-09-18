@@ -1,6 +1,5 @@
 import Foundation
 
-
 class BikeUpdate: Decodable, Encodable {
 
   struct Register: Decodable, Encodable {
@@ -19,7 +18,6 @@ class BikeUpdate: Decodable, Encodable {
   let lastError: Int
   let time: TimeInterval
 }
-
 
 class BikeData {
 
@@ -60,7 +58,6 @@ class BikeData {
   weak var btConnection: BtConnection?
   var saveTimer: Timer!
 
-
   init() {
     time = Date().timeIntervalSinceReferenceDate
     for id in RegisterId.allCases {
@@ -75,25 +72,25 @@ class BikeData {
   }
 
   func save() {
-    for r in registers {
-      if !r.id.isLive() {
-        saveRegister(r)
+    for register in registers {
+      if !register.id.isLive() {
+        saveRegister(register)
       }
     }
   }
 
   func getRegister(_ id: RegisterId) -> Register? {
-    return registers.first() { $0.id == id } ?? nil
+    return registers.first { $0.id == id } ?? nil
   }
 
   func update(_ data: BikeUpdate) {
     status = String(format: "%@ (time: %.0lf/%.0lfms)", data.status, data.time, (Date().timeIntervalSinceReferenceDate - time) * 1000.0)
     time = Date().timeIntervalSinceReferenceDate
-    for r in data.registers {
-      guard let id = RegisterId(rawValue: r.id) else {
+    for register in data.registers {
+      guard let id = RegisterId(rawValue: register.id) else {
         continue
       }
-      let newRegister = Register(id: id, value: r.value, timestamp: time)
+      let newRegister = Register(id: id, value: register.value, timestamp: time)
       if id == .speed {
         updateOdometer(currentSpeed: newRegister)
       }
@@ -127,11 +124,9 @@ class BikeData {
   }
 
   private func setRegister(_ register: Register) {
-    for (i, v) in registers.enumerated() {
-      if v.id == register.id {
-        registers[i] = register
-        return
-      }
+    for (i, value) in registers.enumerated() where value.id == register.id {
+      registers[i] = register
+      return
     }
     registers.append(register)
   }
@@ -147,8 +142,8 @@ class BikeData {
   }
 
   private func loadRegister(_ id: RegisterId) {
-    let v = UserDefaults.standard.value(forKey: String(reflecting: id)) as? Int ?? 0
-    setRegister(Register(id: id, value: v, timestamp: Date().timeIntervalSinceReferenceDate))
+    let value = UserDefaults.standard.value(forKey: String(reflecting: id)) as? Int ?? 0
+    setRegister(Register(id: id, value: value, timestamp: Date().timeIntervalSinceReferenceDate))
   }
 
   private func saveRegister(_ register: Register) {
@@ -162,15 +157,14 @@ class BikeData {
     let time = currentSpeed.timestamp - oldSpeed.timestamp
     let speedMs = ((oldSpeed.normalizeSpeed() + currentSpeed.normalizeSpeed()) / 2.0).kmh2ms()
     let distanceMm = Int((speedMs * time).m2mm().rounded())
-    let add = { (r: RegisterId) in
-      let v = self.getRegister(r)?.value ?? 0
-      self.setRegister(Register(id: r, value: v + distanceMm, timestamp: currentSpeed.timestamp))
+    let add = { (id: RegisterId) in
+      let value = self.getRegister(id)?.value ?? 0
+      self.setRegister(Register(id: id, value: value + distanceMm, timestamp: currentSpeed.timestamp))
     }
     add(.odometer)
     add(.trip)
   }
 }
-
 
 extension BikeData.Register {
   // using km for distance, kh/h for speed, celsius for temperature, [0...1] for percentage
@@ -252,8 +246,8 @@ extension BikeData.Register {
   }
 
   func coolantLabel() -> String {
-    let c = normalizeTemperature()
-    return String(format: "Coolant: %.0lf°C | %.0lf°F", c, c.c2f())
+    let temp = normalizeTemperature()
+    return String(format: "Coolant: %.0lf°C | %.0lf°F", temp, temp.c2f())
   }
 
   func rpmLabel() -> String {

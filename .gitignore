@@ -2,6 +2,7 @@
 *.xccheckout
 *.xcuserstate
 *xcuserdata
+*xcshareddata
 *.xcscmblueprint
 .DS_Store
 .idea

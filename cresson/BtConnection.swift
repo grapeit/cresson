@@ -1,12 +1,10 @@
 import Foundation
 import CoreBluetooth
 
-
 protocol BtConnectionDelegate: class {
   func status(_ status: String)
   func update(_ data: BikeUpdate)
 }
-
 
 class BtConnection: NSObject {
   private let deviceName = "cresson"
@@ -23,7 +21,6 @@ class BtConnection: NSObject {
   private(set) var connected = false
 
   weak var delegate: BtConnectionDelegate?
-
 
   func start() {
     manager = CBCentralManager(delegate: self, queue: nil)
@@ -42,7 +39,7 @@ class BtConnection: NSObject {
     characteristic = nil
     peripheral = nil
     Timer.scheduledTimer(withTimeInterval: retryInterval, repeats: false) {_ in
-      if (self.manager.state == CBManagerState.poweredOn) {
+      if self.manager.state == CBManagerState.poweredOn {
         self.delegate?.status("searching for device")
         self.manager.scanForPeripherals(withServices: [self.serviceId], options: nil)
       }
@@ -51,15 +48,14 @@ class BtConnection: NSObject {
 
   private func dataIn(_ data: Data) {
     dataCollected += data
-    while let n = dataCollected.firstIndex(of: UInt8(0x0A)) { // 0x0A = `\n`
-      if let j = try? JSONDecoder().decode(BikeUpdate.self, from: dataCollected[..<n]) {
+    while let i = dataCollected.firstIndex(of: UInt8(0x0A)) { // 0x0A = `\n`
+      if let j = try? JSONDecoder().decode(BikeUpdate.self, from: dataCollected[..<i]) {
         delegate?.update(j)
       }
-      dataCollected = dataCollected[dataCollected.index(n, offsetBy: 1)...]
+      dataCollected = dataCollected[dataCollected.index(i, offsetBy: 1)...]
     }
   }
 }
-
 
 extension BtConnection: CBCentralManagerDelegate {
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -73,7 +69,7 @@ extension BtConnection: CBCentralManagerDelegate {
     }
   }
 
-  func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+  func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
     let device = (advertisementData as NSDictionary).object(forKey: CBAdvertisementDataLocalNameKey) as? NSString
     if device?.isEqual(to: deviceName) == true {
       manager.stopScan()
@@ -98,28 +94,23 @@ extension BtConnection: CBCentralManagerDelegate {
   }
 }
 
-
 extension BtConnection: CBPeripheralDelegate {
   func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-    for service in peripheral.services! {
-      if service.uuid == serviceId {
-        peripheral.discoverCharacteristics(nil, for: service)
-        delegate?.status("connecting (stage 3 of 3)")
-        return
-      }
+    for service in peripheral.services! where service.uuid == serviceId {
+      peripheral.discoverCharacteristics(nil, for: service)
+      delegate?.status("connecting (stage 3 of 3)")
+      return
     }
     onConnectionFailed("requred service is not found")
   }
 
   func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-    for characteristic in service.characteristics! {
-      if characteristic.uuid == characteristicId {
-        self.characteristic = characteristic
-        peripheral.setNotifyValue(true, for: characteristic)
-        connected = true
-        delegate?.status("connected")
-        return
-      }
+    for characteristic in service.characteristics! where characteristic.uuid == characteristicId {
+      self.characteristic = characteristic
+      peripheral.setNotifyValue(true, for: characteristic)
+      connected = true
+      delegate?.status("connected")
+      return
     }
     onConnectionFailed("required characteristic not found")
   }

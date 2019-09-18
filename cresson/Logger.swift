@@ -1,11 +1,9 @@
 import Foundation
 
-
 private let cressonService = URL(string: "https://cresson-api.the-grape.com")!
 private let fileNamePrefix = "data_feed-"
 private let fileNameSuffix = ".log"
 private let timestampDupFix = 0.001
-
 
 private extension String {
   func fileIndex() -> Int? {
@@ -18,14 +16,12 @@ private extension String {
   }
 }
 
-
 class Logger {
   private let fileSizeLimit = 256 * 1024
   private var currentFile: FileHandle?
   private var currentFileName: URL?
   private var uploadQueue: UploadQueue?
   private var lastTimestamp = 0.0
-
 
   func log(_ registers: [BikeData.Register]) {
     DispatchQueue.global(qos: .utility).async {
@@ -94,8 +90,8 @@ class Logger {
       return nil
     }
     var index = 0
-    for f in files {
-      if let i = f.fileIndex(), i > index {
+    for file in files {
+      if let i = file.fileIndex(), i > index {
         index = i
       }
     }
@@ -118,7 +114,6 @@ class Logger {
   }
 }
 
-
 private class UploadQueue {
   private let retryInterval = 5.0
   private var fileQueue = [URL]()
@@ -126,7 +121,6 @@ private class UploadQueue {
   private var suspended = false
   private var execQueue: DispatchQueue
   private var authToken: String?
-
 
   init() {
     execQueue = DispatchQueue(label: "UploadQueue", qos: .background)
@@ -138,7 +132,7 @@ private class UploadQueue {
     }
     var toUpload = files.filter { $0.fileIndex() != nil }
     toUpload.sort { return $0.compare($1, options: .numeric) == .orderedAscending }
-    fileQueue = toUpload.map() { url.appendingPathComponent($0) }
+    fileQueue = toUpload.map { url.appendingPathComponent($0) }
     uploadLater()
   }
 
@@ -195,7 +189,7 @@ private class UploadQueue {
   private func onUploadSucceed(_ file: URL) {
     execQueue.sync {
       print("UploadQueue.onUploadSucceed", file)
-      fileQueue.removeAll() { $0 == file }
+      fileQueue.removeAll { $0 == file }
       uploading = false
       upload()
     }
@@ -234,15 +228,15 @@ private class UploadQueue {
     request.addValue("application/zlib", forHTTPHeaderField: "Content-Type")
     request.httpBody = compressed
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
-      guard error == nil, let data = data, let r = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
+      guard error == nil, let data = data, let response = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
         self.onUploadError(file, error: error != nil ? error.debugDescription : "")
         return
       }
-      if r.status == "ok" {
+      if response.status == "ok" {
         try? FileManager.default.removeItem(at: file)
         self.onUploadSucceed(file)
       } else {
-        self.onUploadError(file, error: r.error ?? "")
+        self.onUploadError(file, error: response.error ?? "")
       }
     }
     task.resume()
@@ -252,14 +246,14 @@ private class UploadQueue {
     var request = URLRequest(url: cressonService.appendingPathComponent("authorize"))
     request.httpMethod = "GET"
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
-      guard error == nil, let data = data, let r = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
+      guard error == nil, let data = data, let response = try? JSONDecoder().decode(ServerResponse.self, from: data) else {
         self.onAuthError(error: error != nil ? error.debugDescription : "")
         return
       }
-      if r.status == "ok", let token = r.token {
+      if response.status == "ok", let token = response.token {
         self.onAuthSucceed(token: token)
       } else {
-        self.onAuthError(error: r.error ?? "")
+        self.onAuthError(error: response.error ?? "")
       }
     }
     task.resume()
