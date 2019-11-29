@@ -3,7 +3,7 @@ import UIKit
 class RegisterTableViewCell: UITableViewCell {
 
   @IBOutlet weak var label: UILabel!
-  var registerId: BikeData.RegisterId?
+  var registerId: String?
 
   override func awakeFromNib() {
       super.awakeFromNib()
@@ -15,9 +15,9 @@ class RegisterTableViewCell: UITableViewCell {
       // Configure the view for the selected state
   }
 
-  func setRegister(_ register: BikeData.Register, connected: Bool) {
+  func setRegister(_ register: DataRegister, connected: Bool) {
     registerId = register.id
-    label.text = register.label()
-    label.textColor = (!connected && register.id.isLive()) ? .lightGray : .black
+    label.text = register.label
+    label.textColor = connected ? .black : .lightGray
   }
 }

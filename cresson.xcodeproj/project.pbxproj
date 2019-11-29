@@ -18,7 +18,11 @@
 		FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6837D9220E912F00A60BB4 /* BtConnection.swift */; };
 		FA93BE72227BD6C5008AB1D8 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA93BE71227BD6C5008AB1D8 /* Logger.swift */; };
 		FA93BE76227D3689008AB1D8 /* StatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA93BE75227D3689008AB1D8 /* StatusViewController.swift */; };
-		FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* BikeData.swift */; };
+		FAB28DD4237E152600111DB1 /* DataRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB28DD3237E152600111DB1 /* DataRegister.swift */; };
+		FAB28DD6237E164200111DB1 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB28DD5237E164200111DB1 /* DataProvider.swift */; };
+		FAB28DD8237E192700111DB1 /* DataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB28DD7237E192700111DB1 /* DataCollector.swift */; };
+		FAB28DDA237E1D9900111DB1 /* CressonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB28DD9237E1D9900111DB1 /* CressonApp.swift */; };
+		FAB8333C220F5C2D00BE63FB /* NinjaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* NinjaData.swift */; };
 		FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */; };
 		FADEE41D221BA73F0046CB4B /* RegisterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */; };
 /* End PBXBuildFile section */
@@ -37,7 +41,11 @@
 		FA6837D9220E912F00A60BB4 /* BtConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtConnection.swift; sourceTree = "<group>"; };
 		FA93BE71227BD6C5008AB1D8 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		FA93BE75227D3689008AB1D8 /* StatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusViewController.swift; sourceTree = "<group>"; };
-		FAB8333B220F5C2D00BE63FB /* BikeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeData.swift; sourceTree = "<group>"; };
+		FAB28DD3237E152600111DB1 /* DataRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataRegister.swift; sourceTree = "<group>"; };
+		FAB28DD5237E164200111DB1 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
+		FAB28DD7237E192700111DB1 /* DataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCollector.swift; sourceTree = "<group>"; };
+		FAB28DD9237E1D9900111DB1 /* CressonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CressonApp.swift; sourceTree = "<group>"; };
+		FAB8333B220F5C2D00BE63FB /* NinjaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinjaData.swift; sourceTree = "<group>"; };
 		FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewCell.swift; sourceTree = "<group>"; };
 		FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegisterTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -72,14 +80,14 @@
 		FA31723D220E53440081DB6B /* cresson */ = {
 			isa = PBXGroup;
 			children = (
+				FAB28DD2237E150D00111DB1 /* DataLayer */,
+				FAB90D822391893200110E3D /* DataProviders */,
+				FABB164C2380355C00AB612F /* Utilities */,
 				FA31723E220E53440081DB6B /* AppDelegate.swift */,
+				FAB28DD9237E1D9900111DB1 /* CressonApp.swift */,
 				FA317240220E53440081DB6B /* DashboardViewController.swift */,
 				FA93BE75227D3689008AB1D8 /* StatusViewController.swift */,
-				FAB8333B220F5C2D00BE63FB /* BikeData.swift */,
 				FA93BE71227BD6C5008AB1D8 /* Logger.swift */,
-				FA5C2B06227F613E001E9D83 /* DataCompression.swift */,
-				FA012584227299D8004A648F /* Conversion.swift */,
-				FA122CFA228E714E0090D96A /* NetworkHelper.swift */,
 				FA6837D9220E912F00A60BB4 /* BtConnection.swift */,
 				FA317242220E53440081DB6B /* Main.storyboard */,
 				FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */,
@@ -89,6 +97,34 @@
 				FA31724A220E53460081DB6B /* Info.plist */,
 			);
 			path = cresson;
+			sourceTree = "<group>";
+		};
+		FAB28DD2237E150D00111DB1 /* DataLayer */ = {
+			isa = PBXGroup;
+			children = (
+				FAB28DD3237E152600111DB1 /* DataRegister.swift */,
+				FAB28DD5237E164200111DB1 /* DataProvider.swift */,
+				FAB28DD7237E192700111DB1 /* DataCollector.swift */,
+			);
+			path = DataLayer;
+			sourceTree = "<group>";
+		};
+		FAB90D822391893200110E3D /* DataProviders */ = {
+			isa = PBXGroup;
+			children = (
+				FAB8333B220F5C2D00BE63FB /* NinjaData.swift */,
+			);
+			path = DataProviders;
+			sourceTree = "<group>";
+		};
+		FABB164C2380355C00AB612F /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				FA012584227299D8004A648F /* Conversion.swift */,
+				FA5C2B06227F613E001E9D83 /* DataCompression.swift */,
+				FA122CFA228E714E0090D96A /* NetworkHelper.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -186,14 +222,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA93BE76227D3689008AB1D8 /* StatusViewController.swift in Sources */,
+				FAB28DD4237E152600111DB1 /* DataRegister.swift in Sources */,
 				FA317241220E53440081DB6B /* DashboardViewController.swift in Sources */,
 				FA122CFB228E714E0090D96A /* NetworkHelper.swift in Sources */,
 				FA6837DA220E912F00A60BB4 /* BtConnection.swift in Sources */,
 				FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */,
+				FAB28DD6237E164200111DB1 /* DataProvider.swift in Sources */,
 				FA012585227299D8004A648F /* Conversion.swift in Sources */,
 				FA5C2B07227F613E001E9D83 /* DataCompression.swift in Sources */,
 				FA93BE72227BD6C5008AB1D8 /* Logger.swift in Sources */,
-				FAB8333C220F5C2D00BE63FB /* BikeData.swift in Sources */,
+				FAB28DD8237E192700111DB1 /* DataCollector.swift in Sources */,
+				FAB28DDA237E1D9900111DB1 /* CressonApp.swift in Sources */,
+				FAB8333C220F5C2D00BE63FB /* NinjaData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

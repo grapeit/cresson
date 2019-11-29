@@ -20,7 +20,7 @@ identifier_name:
     - j
 
 nesting:
-  type_level: 2
+  type_level: 3
 
 function_body_length: 50
 

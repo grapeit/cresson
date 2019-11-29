@@ -3,7 +3,7 @@ import CoreBluetooth
 
 protocol BtConnectionDelegate: class {
   func status(_ status: String)
-  func update(_ data: BikeUpdate)
+  func update(_ data: Data)
 }
 
 class BtConnection: NSObject {
@@ -15,8 +15,6 @@ class BtConnection: NSObject {
   private var manager: CBCentralManager!
   private var peripheral: CBPeripheral!
   private var characteristic: CBCharacteristic!
-
-  private var dataCollected = Data()
 
   private(set) var connected = false
 
@@ -43,16 +41,6 @@ class BtConnection: NSObject {
         self.delegate?.status("searching for device")
         self.manager.scanForPeripherals(withServices: [self.serviceId], options: nil)
       }
-    }
-  }
-
-  private func dataIn(_ data: Data) {
-    dataCollected += data
-    while let i = dataCollected.firstIndex(of: UInt8(0x0A)) { // 0x0A = `\n`
-      if let j = try? JSONDecoder().decode(BikeUpdate.self, from: dataCollected[..<i]) {
-        delegate?.update(j)
-      }
-      dataCollected = dataCollected[dataCollected.index(i, offsetBy: 1)...]
     }
   }
 }
@@ -117,7 +105,7 @@ extension BtConnection: CBPeripheralDelegate {
 
   func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
     if characteristic.uuid == characteristicId, let data = characteristic.value {
-      dataIn(data)
+      delegate?.update(data)
     }
   }
 }

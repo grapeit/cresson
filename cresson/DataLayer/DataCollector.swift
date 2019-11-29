@@ -1,0 +1,66 @@
+import Foundation
+
+class DataCollector {
+  private var secondarySources = [DataProvider]()
+  private var calculatedSources = [(DataObserver, DataProvider)]()
+  private var observers = [DataObserver]()
+
+  private var currentStatus = DataProviderStatus.offline("")
+  private var currentData = [String: DataRegister]()
+
+  func addObserver(_ observer: DataObserver) {
+    observers.append(observer)
+  }
+
+  func removeObserver(_ observer: DataObserver) {
+    //TODO: remove observer
+  }
+
+  func getRegister(_ id: String) -> DataRegister? {
+    return currentData[id]
+  }
+}
+
+extension DataCollector: DataProvider {
+  var status: DataProviderStatus {
+    return currentStatus
+  }
+
+  var data: [DataRegister] {
+    return currentData.map { $0.value }
+  }
+}
+
+extension DataCollector: DataObserver {
+  func status(_ status: DataProviderStatus) {
+    currentStatus = status
+    for observer in observers {
+      observer.status(currentStatus)
+    }
+  }
+
+  func data(_ data: [DataRegister]) {
+    currentData.removeAll()
+    for register in data {
+      currentData[register.id] = register
+    }
+    for source in secondarySources {
+      for register in source.data {
+        currentData[register.id] = register
+      }
+    }
+    var registers = currentData.map { $0.value }
+    if !calculatedSources.isEmpty {
+      for source in calculatedSources {
+        source.0.data(registers)
+        for register in source.1.data {
+          currentData[register.id] = register
+        }
+      }
+      registers = currentData.map { $0.value }
+    }
+    for observer in observers {
+      observer.data(registers)
+    }
+  }
+}
