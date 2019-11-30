@@ -3,6 +3,7 @@ import UIKit
 class CressonApp {
   let dataCollector = DataCollector()
   var ninjaData: NinjaData!
+  var tripMeterData: TripMeterData!
   var logger: Logger!
 
   private var observers = [Any]()
@@ -22,10 +23,17 @@ class CressonApp {
 
   func connect() {
     ninjaData = NinjaData()
+    tripMeterData = TripMeterData()
     logger = Logger()
+    dataCollector.primarySource = ninjaData
+    dataCollector.addCalculatedSource(tripMeterData)
+    dataCollector.primarySource.dataCollector = dataCollector
+    dataCollector.primarySource.idleCycle()
+    dataCollector.addObserver(logger)
+    //NOTE: view controllers register as data observers themselfs
   }
 
   func saveData() {
-    ninjaData?.save()
+    tripMeterData?.save()
   }
 }

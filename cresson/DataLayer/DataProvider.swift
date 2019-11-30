@@ -22,11 +22,16 @@ enum DataProviderStatus: Equatable {
 }
 
 protocol DataProvider {
-  var status: DataProviderStatus { get }
   var data: [DataRegister] { get }
+  func enumRegisterIds(id: (String) -> Void)
 }
 
 protocol DataObserver {
   func status(_ status: DataProviderStatus)
   func data(_ data: [DataRegister])
+}
+
+protocol PrimaryDataProvider {
+  var dataCollector: DataObserver? { get set }
+  func idleCycle()
 }

@@ -1,18 +1,6 @@
 import Foundation
 
 extension Double {
-  func m2mm() -> Double {
-    return self * 1000.0
-  }
-
-  func mm2m() -> Double {
-    return self / 1000.0
-  }
-
-  func mm2km() -> Double {
-    return self / 1000000.0
-  }
-
   func m2km() -> Double {
     return self * 1000.0
   }

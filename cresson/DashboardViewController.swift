@@ -6,7 +6,7 @@ class DashboardViewController: UIViewController {
   @IBOutlet weak var statusLabel: UILabel!
 
   var connected = false
-  var observers = [Any]()
+  var registerIds = [String]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -16,12 +16,7 @@ class DashboardViewController: UIViewController {
     dataView.tableFooterView = UIView(frame: .zero)
     statusLabel.text = ""
     CressonApp.shared.dataCollector.addObserver(self)
-  }
-
-  deinit {
-    for observer in observers {
-      NotificationCenter.default.removeObserver(observer)
-    }
+    CressonApp.shared.dataCollector.enumRegisterIds { registerIds.append($0) }
   }
 
   private func onConnectionStatusChanged() {
@@ -32,23 +27,26 @@ class DashboardViewController: UIViewController {
 
 extension DashboardViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return CressonApp.shared.ninjaData.data.count
+    return registerIds.count
   }
 
   func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-    let id = CressonApp.shared.ninjaData.data[indexPath.row].rId
-    if id == .trip {
-      return UISwipeActionsConfiguration(actions: [reset(register: id, at: indexPath)])
+    guard indexPath.row < registerIds.count else {
+      return nil
     }
-    if id == .map && connected {
+    let id = registerIds[indexPath.row]
+    if id == "c-trip" {
+      return UISwipeActionsConfiguration(actions: [resetTrip(at: indexPath)])
+    }
+    if id == "k-map" && connected {
       return UISwipeActionsConfiguration(actions: [switchMap(at: indexPath)])
     }
     return UISwipeActionsConfiguration(actions: [])
   }
 
-  private func reset(register: NinjaData.RegisterId, at indexPath: IndexPath) -> UIContextualAction {
+  private func resetTrip(at indexPath: IndexPath) -> UIContextualAction {
     let action = UIContextualAction(style: .normal, title: "Reset") { (_, _, completion) in
-      CressonApp.shared.ninjaData.resetRegisterFromUI(register)
+      CressonApp.shared.tripMeterData?.reset()
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
@@ -57,10 +55,10 @@ extension DashboardViewController: UITableViewDelegate {
   }
 
   private func switchMap(at indexPath: IndexPath) -> UIContextualAction {
-    let current = CressonApp.shared.ninjaData.getRegister(.map)?.rValue ?? 0
+    let current = CressonApp.shared.dataCollector.getRegister("k-map")?.value ?? 0
     let next = current == 1 ? 2 : 1
     return UIContextualAction(style: .normal, title: "\(next)") { (_, _, completion) in
-      CressonApp.shared.ninjaData.setRegisterFromUI(NinjaData.Register(rId: .map, rValue: next, timestamp: Date().timeIntervalSinceReferenceDate))
+      CressonApp.shared.ninjaData.sendMap(next, withRetry: true)
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
@@ -70,8 +68,12 @@ extension DashboardViewController: UITableViewDelegate {
 extension DashboardViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = dataView.dequeueReusableCell(withIdentifier: "RegisterTableViewCell", for: indexPath)
-    if let cell = cell as? RegisterTableViewCell {
-      cell.setRegister(CressonApp.shared.ninjaData.data[indexPath.row], connected: connected)
+    guard indexPath.row < registerIds.count else {
+      return cell
+    }
+    let id = registerIds[indexPath.row]
+    if let cell = cell as? RegisterTableViewCell, let register = CressonApp.shared.dataCollector.getRegister(id) {
+      cell.setRegister(register, connected: connected)
     }
     return cell
   }

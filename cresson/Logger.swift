@@ -25,7 +25,6 @@ class Logger {
   private var lastTimestamp = 0.0
 
   init() {
-    CressonApp.shared.dataCollector.addObserver(self)
     initUploadQueue()
   }
 

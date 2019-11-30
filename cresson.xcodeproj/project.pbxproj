@@ -23,6 +23,7 @@
 		FAB28DD8237E192700111DB1 /* DataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB28DD7237E192700111DB1 /* DataCollector.swift */; };
 		FAB28DDA237E1D9900111DB1 /* CressonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB28DD9237E1D9900111DB1 /* CressonApp.swift */; };
 		FAB8333C220F5C2D00BE63FB /* NinjaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* NinjaData.swift */; };
+		FAB90D84239189DD00110E3D /* TripMeterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB90D83239189DD00110E3D /* TripMeterData.swift */; };
 		FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */; };
 		FADEE41D221BA73F0046CB4B /* RegisterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */; };
 /* End PBXBuildFile section */
@@ -46,6 +47,7 @@
 		FAB28DD7237E192700111DB1 /* DataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCollector.swift; sourceTree = "<group>"; };
 		FAB28DD9237E1D9900111DB1 /* CressonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CressonApp.swift; sourceTree = "<group>"; };
 		FAB8333B220F5C2D00BE63FB /* NinjaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinjaData.swift; sourceTree = "<group>"; };
+		FAB90D83239189DD00110E3D /* TripMeterData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripMeterData.swift; sourceTree = "<group>"; };
 		FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewCell.swift; sourceTree = "<group>"; };
 		FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegisterTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -113,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				FAB8333B220F5C2D00BE63FB /* NinjaData.swift */,
+				FAB90D83239189DD00110E3D /* TripMeterData.swift */,
 			);
 			path = DataProviders;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				FAB28DDA237E1D9900111DB1 /* CressonApp.swift in Sources */,
 				FAB8333C220F5C2D00BE63FB /* NinjaData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
+				FAB90D84239189DD00110E3D /* TripMeterData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
