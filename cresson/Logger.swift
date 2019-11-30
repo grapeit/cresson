@@ -21,20 +21,11 @@ class Logger {
   private var currentFile: FileHandle?
   private var currentFileName: URL?
   private var uploadQueue: UploadQueue?
+  private var connected = false
   private var lastTimestamp = 0.0
 
-  func log(_ registers: [BikeData.Register]) {
-    DispatchQueue.global(qos: .utility).async {
-      objc_sync_enter(self)
-      self.writeLog(registers)
-      objc_sync_exit(self)
-    }
-  }
-
-  func initBackgoundUpload() {
-    DispatchQueue.global(qos: .background).async {
-      self.initUploadQueue()
-    }
+  init() {
+    initUploadQueue()
   }
 
   func upload() {
@@ -53,7 +44,7 @@ class Logger {
     objc_sync_exit(self)
   }
 
-  private func writeLog(_ registers: [BikeData.Register]) {
+  private func writeLog(_ registers: [DataRegister]) {
     var timestamp = Date.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1970AndReferenceDate
     if timestamp <= lastTimestamp {
       timestamp = lastTimestamp + timestampDupFix
@@ -62,9 +53,7 @@ class Logger {
 
     var entry = [String: Double]()
     for register in registers {
-      if let key = String(reflecting: register.id).components(separatedBy: ".").last {
-        entry[key] = register.normalize()
-      }
+      entry[register.id] = register.value
     }
     entry["ts"] = timestamp
 
@@ -111,6 +100,26 @@ class Logger {
     uploadQueue!.push(file: currentFileName!)
     currentFile = nil
     currentFileName = nil
+  }
+}
+
+extension Logger: DataObserver {
+  func status(_ status: DataProviderStatus) {
+    let connected = status.isOnline
+    if connected != self.connected {
+      self.connected = connected
+      if !connected {
+        upload()
+      }
+    }
+  }
+
+  func data(_ data: [DataRegister]) {
+    DispatchQueue.global(qos: .utility).async {
+      objc_sync_enter(self)
+      self.writeLog(data)
+      objc_sync_exit(self)
+    }
   }
 }
 

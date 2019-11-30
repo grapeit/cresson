@@ -5,10 +5,8 @@ class DashboardViewController: UIViewController {
   @IBOutlet weak var dataView: UITableView!
   @IBOutlet weak var statusLabel: UILabel!
 
-  var btConnection = BtConnection()
-  let bikeData = BikeData()
   var connected = false
-  var observers = [Any]()
+  var registerIds = [String]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -17,17 +15,8 @@ class DashboardViewController: UIViewController {
     dataView.dataSource = self
     dataView.tableFooterView = UIView(frame: .zero)
     statusLabel.text = ""
-    observers.append(NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() })
-    observers.append(NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in self?.bikeData.save() })
-    btConnection.delegate = self
-    btConnection.start()
-    bikeData.btConnection = btConnection
-  }
-
-  deinit {
-    for observer in observers {
-      NotificationCenter.default.removeObserver(observer)
-    }
+    CressonApp.shared.dataCollector.addObserver(self)
+    CressonApp.shared.dataCollector.enumRegisterIds { registerIds.append($0) }
   }
 
   private func onConnectionStatusChanged() {
@@ -36,51 +25,28 @@ class DashboardViewController: UIViewController {
   }
 }
 
-extension DashboardViewController: BtConnectionDelegate {
-  func status(_ status: String) {
-    print(status)
-    if connected && !btConnection.connected {
-      bikeData.onConnectionLost()
-      connected = false
-      onConnectionStatusChanged()
-    }
-    statusLabel.text = status
-  }
-
-  func update(_ data: BikeUpdate) {
-    bikeData.update(data)
-    for cell in dataView.visibleCells {
-      if let cell = cell as? RegisterTableViewCell, let id = cell.registerId, let register = bikeData.getRegister(id) {
-        cell.setRegister(register, connected: connected)
-      }
-    }
-    if connected != bikeData.connected {
-      connected = bikeData.connected
-      onConnectionStatusChanged()
-    }
-    statusLabel.text = bikeData.status
-  }
-}
-
 extension DashboardViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return bikeData.registers.count
+    return registerIds.count
   }
 
   func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-    let id = bikeData.registers[indexPath.row].id
-    if id == .trip {
-      return UISwipeActionsConfiguration(actions: [reset(register: id, at: indexPath)])
+    guard indexPath.row < registerIds.count else {
+      return nil
     }
-    if id == .map && connected {
+    let id = registerIds[indexPath.row]
+    if id == tripMeterRegisterId {
+      return UISwipeActionsConfiguration(actions: [resetTrip(at: indexPath)])
+    }
+    if id == throttleRegisterId && connected {
       return UISwipeActionsConfiguration(actions: [switchMap(at: indexPath)])
     }
     return UISwipeActionsConfiguration(actions: [])
   }
 
-  private func reset(register: BikeData.RegisterId, at indexPath: IndexPath) -> UIContextualAction {
+  private func resetTrip(at indexPath: IndexPath) -> UIContextualAction {
     let action = UIContextualAction(style: .normal, title: "Reset") { (_, _, completion) in
-      self.bikeData.resetRegisterFromUI(register)
+      CressonApp.shared.tripMeterData?.reset()
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
@@ -89,10 +55,10 @@ extension DashboardViewController: UITableViewDelegate {
   }
 
   private func switchMap(at indexPath: IndexPath) -> UIContextualAction {
-    let current = bikeData.getRegister(.map)?.value ?? 0
+    let current = CressonApp.shared.dataCollector.getRegister(throttleRegisterId)?.value ?? 0
     let next = current == 1 ? 2 : 1
     return UIContextualAction(style: .normal, title: "\(next)") { (_, _, completion) in
-      self.bikeData.setRegisterFromUI(BikeData.Register(id: .map, value: next, timestamp: Date().timeIntervalSinceReferenceDate))
+      CressonApp.shared.ninjaData.sendMap(next, withRetry: true)
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
@@ -102,9 +68,32 @@ extension DashboardViewController: UITableViewDelegate {
 extension DashboardViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = dataView.dequeueReusableCell(withIdentifier: "RegisterTableViewCell", for: indexPath)
-    if let cell = cell as? RegisterTableViewCell {
-      cell.setRegister(bikeData.registers[indexPath.row], connected: connected)
+    guard indexPath.row < registerIds.count else {
+      return cell
+    }
+    let id = registerIds[indexPath.row]
+    if let cell = cell as? RegisterTableViewCell, let register = CressonApp.shared.dataCollector.getRegister(id) {
+      cell.setRegister(register, connected: connected)
     }
     return cell
+  }
+}
+
+extension DashboardViewController: DataObserver {
+  func status(_ status: DataProviderStatus) {
+    let connected = status.isOnline
+    if connected != self.connected {
+      self.connected = connected
+      onConnectionStatusChanged()
+    }
+    statusLabel.text = status.message
+  }
+
+  func data(_ data: [DataRegister]) {
+    for cell in dataView.visibleCells {
+      if let cell = cell as? RegisterTableViewCell, let id = cell.registerId, let register = CressonApp.shared.dataCollector.getRegister(id) {
+        cell.setRegister(register, connected: connected)
+      }
+    }
   }
 }

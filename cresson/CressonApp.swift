@@ -1,0 +1,47 @@
+import UIKit
+
+class CressonApp {
+  var dataCollector: DataCollector!
+  var ninjaData: NinjaData!
+  var tripMeterData: TripMeterData!
+  var logger: Logger!
+
+  private var observers = [Any]()
+
+  static let shared = CressonApp()
+
+  private init() {
+    observers.append(NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] _ in self?.saveData() })
+    observers.append(NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in self?.saveData() })
+  }
+
+  deinit {
+    for observer in observers {
+      NotificationCenter.default.removeObserver(observer)
+    }
+  }
+
+  func connect() {
+    dataCollector = DataCollector()
+    ninjaData = NinjaData()
+    tripMeterData = TripMeterData()
+    logger = Logger()
+    dataCollector.primarySource = ninjaData
+    dataCollector.addCalculatedSource(tripMeterData)
+    dataCollector.primarySource.dataCollector = dataCollector
+    dataCollector.primarySource.idleCycle()
+    dataCollector.addObserver(logger)
+    //NOTE: view controllers register as data observers themselfs
+  }
+
+  func disconnect() {
+    dataCollector = nil
+    ninjaData = nil
+    tripMeterData = nil
+    logger = nil
+  }
+
+  func saveData() {
+    tripMeterData?.save()
+  }
+}
