@@ -46,7 +46,7 @@ class NinjaData {
   private var btConnection = BtConnection()
 
   //PrimaryDataProvider
-  var dataCollector: DataObserver?
+  weak var dataCollector: DataObserver?
 
   init() {
     for id in RegisterId.allCases {

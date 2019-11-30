@@ -1,6 +1,6 @@
 import Foundation
 
-enum DataProviderStatus: Equatable {
+enum DataProviderStatus {
   case offline(String)
   case online(String)
 
@@ -26,7 +26,7 @@ protocol DataProvider {
   func enumRegisterIds(id: (String) -> Void)
 }
 
-protocol DataObserver {
+protocol DataObserver: class {
   func status(_ status: DataProviderStatus)
   func data(_ data: [DataRegister])
 }
