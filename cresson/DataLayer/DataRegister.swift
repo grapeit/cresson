@@ -14,7 +14,8 @@ import Foundation
 
  Other:
   percentage - [0...1]
-  gear position, throttle map - values as is
+  gear position, throttle map - value as is
+  direction - degrees, north is 0, east is 90, south is 180, west is 270
 */
 
 /*
@@ -27,6 +28,12 @@ import Foundation
   - k_gear
   - k_speed
   - k_map
+ - Location data
+  - l_latitude
+  - l_longitude
+  - l_altitude
+  - l_speed
+  - l_heading
  - Calculated data
   - c_trip
 */

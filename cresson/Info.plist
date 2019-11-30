@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>App uses bluetooth to access device connected to your vehicle</string>
+	<string>App uses bluetooth to access vehicle data</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow to track location data</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

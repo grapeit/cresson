@@ -15,6 +15,7 @@ const (
 var dataLogColumnsSorted = []string {
 	"ts",
 	"k_gear", "k_throttle", "k_rpm", "k_speed", "k_coolant", "k_battery", "k_map",
+	"l_latitude", "l_longitude", "l_altitude", "l_speed", "l_heading",
 	"c_trip",
 }
 
