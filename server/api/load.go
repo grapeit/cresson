@@ -126,8 +126,8 @@ func loadHandler(c *gin.Context) {
 	timezoneOffsetSec := float64(toInt(c.Query("tzos")))
 
 	var resultRows []map[string]interface{}
-	minRealTs := float64(toTs)
-	maxRealTs := float64(fromTs)
+	minRealTs := float64(toTs) - timezoneOffsetSec
+	maxRealTs := float64(fromTs) - timezoneOffsetSec
 	for rows.Next() {
 		results := make([]float64, 1 + len(dataColumns))
 		scanParam := make([]interface{}, 1 + len(dataColumns))
