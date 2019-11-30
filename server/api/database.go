@@ -13,7 +13,9 @@ const (
 )
 
 var dataLogColumnsSorted = []string {
-	"ts", "gear", "throttle", "rpm", "speed", "coolant", "battery", "map", "trip", "odometer",
+	"ts",
+	"k_gear", "k_throttle", "k_rpm", "k_speed", "k_coolant", "k_battery", "k_map",
+	"c_trip",
 }
 
 var database *sql.DB

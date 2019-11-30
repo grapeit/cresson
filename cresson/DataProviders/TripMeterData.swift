@@ -16,7 +16,7 @@ class TripMeterData {
   }
 
   private var status = DataProviderStatus.offline("")
-  private var trip = Register(id: "c-trip")
+  private var trip = Register(id: tripMeterRegisterId)
   private var prevSpeed: Double?
   private var timestamp: TimeInterval?
 
@@ -53,7 +53,7 @@ extension TripMeterData: DataObserver {
   }
 
   func data(_ data: [DataRegister]) {
-    guard status.isOnline, let speed = data.first(where: { $0.id == "k-speed" })?.value else {
+    guard status.isOnline, let speed = data.first(where: { $0.id == speedRegisterId })?.value else {
       return
     }
     let currentTimestamp = Date().timeIntervalSinceReferenceDate
@@ -74,6 +74,6 @@ extension TripMeterData: DataProvider {
   }
 
   func enumRegisterIds(id: (String) -> Void) {
-    id("c-trip")
+    id(trip.id)
   }
 }

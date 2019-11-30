@@ -180,19 +180,19 @@ extension NinjaData.Register: DataRegister {
   var id: String {
     switch rId {
     case .throttle:
-      return "k-throttle"
+      return "k_throttle"
     case .coolant:
-      return "k-coolant"
+      return "k_coolant"
     case .rpm:
-      return "k-rpm"
+      return "k_rpm"
     case .battery:
-      return "k-battery"
+      return "k_battery"
     case .gear:
-      return "k-gear"
+      return "k_gear"
     case .speed:
-      return "k-speed"
+      return speedRegisterId
     case .map:
-      return "k-map"
+      return throttleRegisterId
     }
   }
 

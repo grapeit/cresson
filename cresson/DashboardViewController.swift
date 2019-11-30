@@ -35,10 +35,10 @@ extension DashboardViewController: UITableViewDelegate {
       return nil
     }
     let id = registerIds[indexPath.row]
-    if id == "c-trip" {
+    if id == tripMeterRegisterId {
       return UISwipeActionsConfiguration(actions: [resetTrip(at: indexPath)])
     }
-    if id == "k-map" && connected {
+    if id == throttleRegisterId && connected {
       return UISwipeActionsConfiguration(actions: [switchMap(at: indexPath)])
     }
     return UISwipeActionsConfiguration(actions: [])
@@ -55,7 +55,7 @@ extension DashboardViewController: UITableViewDelegate {
   }
 
   private func switchMap(at indexPath: IndexPath) -> UIContextualAction {
-    let current = CressonApp.shared.dataCollector.getRegister("k-map")?.value ?? 0
+    let current = CressonApp.shared.dataCollector.getRegister(throttleRegisterId)?.value ?? 0
     let next = current == 1 ? 2 : 1
     return UIContextualAction(style: .normal, title: "\(next)") { (_, _, completion) in
       CressonApp.shared.ninjaData.sendMap(next, withRetry: true)
