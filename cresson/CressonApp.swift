@@ -2,6 +2,7 @@ import UIKit
 
 class CressonApp {
   var dataCollector: DataCollector!
+  var timerData: TimerData!
   var ninjaData: NinjaData!
   var locationData: LocationData!
   var tripMeterData: TripMeterData!
@@ -24,11 +25,12 @@ class CressonApp {
 
   func connect() {
     dataCollector = DataCollector()
+    timerData = TimerData()
     ninjaData = NinjaData()
     locationData = LocationData()
     tripMeterData = TripMeterData()
     logger = Logger()
-    dataCollector.primarySource = ninjaData
+    dataCollector.primarySource = timerData
     dataCollector.addSecondarySource(locationData)
     dataCollector.addCalculatedSource(tripMeterData)
     dataCollector.primarySource.dataCollector = dataCollector
@@ -39,6 +41,7 @@ class CressonApp {
 
   func disconnect() {
     dataCollector = nil
+    timerData = nil
     ninjaData = nil
     locationData = nil
     tripMeterData = nil

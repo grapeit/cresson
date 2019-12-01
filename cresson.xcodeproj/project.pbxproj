@@ -25,6 +25,7 @@
 		FAB8333C220F5C2D00BE63FB /* NinjaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8333B220F5C2D00BE63FB /* NinjaData.swift */; };
 		FAB90D84239189DD00110E3D /* TripMeterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB90D83239189DD00110E3D /* TripMeterData.swift */; };
 		FAB90D862393285200110E3D /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB90D852393285200110E3D /* LocationData.swift */; };
+		FAB90D8823933BF100110E3D /* TimerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB90D8723933BF100110E3D /* TimerData.swift */; };
 		FADEE41C221BA73F0046CB4B /* RegisterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */; };
 		FADEE41D221BA73F0046CB4B /* RegisterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */; };
 /* End PBXBuildFile section */
@@ -50,6 +51,7 @@
 		FAB8333B220F5C2D00BE63FB /* NinjaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinjaData.swift; sourceTree = "<group>"; };
 		FAB90D83239189DD00110E3D /* TripMeterData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripMeterData.swift; sourceTree = "<group>"; };
 		FAB90D852393285200110E3D /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
+		FAB90D8723933BF100110E3D /* TimerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerData.swift; sourceTree = "<group>"; };
 		FADEE41A221BA73F0046CB4B /* RegisterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewCell.swift; sourceTree = "<group>"; };
 		FADEE41B221BA73F0046CB4B /* RegisterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegisterTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,6 +118,7 @@
 		FAB90D822391893200110E3D /* DataProviders */ = {
 			isa = PBXGroup;
 			children = (
+				FAB90D8723933BF100110E3D /* TimerData.swift */,
 				FAB8333B220F5C2D00BE63FB /* NinjaData.swift */,
 				FAB90D852393285200110E3D /* LocationData.swift */,
 				FAB90D83239189DD00110E3D /* TripMeterData.swift */,
@@ -243,6 +246,7 @@
 				FAB8333C220F5C2D00BE63FB /* NinjaData.swift in Sources */,
 				FA31723F220E53440081DB6B /* AppDelegate.swift in Sources */,
 				FAB90D84239189DD00110E3D /* TripMeterData.swift in Sources */,
+				FAB90D8823933BF100110E3D /* TimerData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
