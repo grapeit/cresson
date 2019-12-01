@@ -18,6 +18,9 @@ class LocationData: NSObject {
   private var altitude = Register(id: "l_altitude")
   private var speed = Register(id: "l_speed")
   private var heading = Register(id: "l_heading")
+  private var horAccuracy = Register(id: "l_hor_accuracy")
+  private var vertAccuracy = Register(id: "l_vert_accuracy")
+  private var headAccuracy = Register(id: "l_head_accuracy")
 
   override init() {
     super.init()
@@ -37,10 +40,13 @@ extension LocationData: CLLocationManagerDelegate {
     longitude.value = location.coordinate.longitude
     altitude.value = location.altitude
     speed.value = location.speed
+    horAccuracy.value = location.horizontalAccuracy
+    vertAccuracy.value = location.verticalAccuracy
   }
 
   func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
     heading.value = newHeading.trueHeading
+    headAccuracy.value = newHeading.headingAccuracy
   }
 }
 
@@ -52,7 +58,7 @@ extension LocationData.Register: DataRegister {
 
 extension LocationData: DataProvider {
   var data: [DataRegister] {
-    return [latitude, longitude, altitude, speed, heading]
+    return [latitude, longitude, horAccuracy, altitude, vertAccuracy, speed, heading, headAccuracy]
   }
 
   func enumRegisterIds(id: (String) -> Void) {

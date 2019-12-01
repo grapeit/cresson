@@ -34,6 +34,9 @@ import Foundation
   - l_altitude
   - l_speed
   - l_heading
+  - l_hor_accuracy
+  - l_vert_accuracy
+  - l_head_accuracy
  - Calculated data
   - c_trip
 */
