@@ -1,4 +1,6 @@
-- debug case when app cannot find bluetooth device
+- not all registers should be visible (e.g. altitude/longitude/accuracy)
+- registers may become available/unavailbale in the runtime (e.g. location data)
+  - keep in mind that not all bike registers are reported with every update
 - status/configuration screen
 - better status line
 - adjustable speed error compensation
@@ -6,4 +8,3 @@
 - data charts
 - multi-user/multi-bike support
 - speed up data feed
-- keep odometer on arduino, update when disconnected

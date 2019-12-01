@@ -13,6 +13,7 @@ class LocationData: NSObject {
 
   private let locationManager = CLLocationManager()
 
+  private var locationAvailable = false
   private var latitude = Register(id: "l_latitude")
   private var longitude = Register(id: "l_longitude")
   private var altitude = Register(id: "l_altitude")
@@ -29,9 +30,21 @@ class LocationData: NSObject {
     locationManager.startUpdatingLocation()
     locationManager.startUpdatingHeading()
   }
+
+  private var allRegisters: [DataRegister] {
+    return [latitude, longitude, horAccuracy, altitude, vertAccuracy, speed, heading, headAccuracy]
+  }
+
+  private var headingRegisters: [DataRegister] {
+    return [heading, headAccuracy]
+  }
 }
 
 extension LocationData: CLLocationManagerDelegate {
+  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    locationAvailable = status == .authorizedAlways || status == .authorizedWhenInUse
+  }
+
   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     guard let location = locations.last else {
       return
@@ -39,7 +52,11 @@ extension LocationData: CLLocationManagerDelegate {
     latitude.value = location.coordinate.latitude
     longitude.value = location.coordinate.longitude
     altitude.value = location.altitude
-    speed.value = location.speed
+    if location.speed > 0.0 {
+      speed.value = location.speed
+    } else {
+      speed.value = 0.0
+    }
     horAccuracy.value = location.horizontalAccuracy
     vertAccuracy.value = location.verticalAccuracy
   }
@@ -52,17 +69,20 @@ extension LocationData: CLLocationManagerDelegate {
 
 extension LocationData.Register: DataRegister {
   var label: String {
-    return id.dropFirst(2) + ": \(value)"
+    return id.dropFirst(2) + String(format: ": %.6lg", value)
   }
 }
 
 extension LocationData: DataProvider {
   var data: [DataRegister] {
-    return [latitude, longitude, horAccuracy, altitude, vertAccuracy, speed, heading, headAccuracy]
+    if !locationAvailable {
+      return headingRegisters
+    }
+    return allRegisters
   }
 
   func enumRegisterIds(id: (String) -> Void) {
-    for register in data {
+    for register in allRegisters {
       id(register.id)
     }
   }
