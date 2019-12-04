@@ -69,7 +69,24 @@ extension LocationData: CLLocationManagerDelegate {
 
 extension LocationData.Register: DataRegister {
   var label: String {
-    return id.dropFirst(2) + String(format: ": %.6lg", value)
+    switch id {
+    case "l_speed":
+      return String(format: "speed: %.1lfkm/h | %.1lfmph", value.ms2kmh(), value.ms2mph())
+    case "l_heading":
+      return "heading: " + headingLabel() + String(format: " (%.1lf\u{00B0})", value)
+    default:
+      return id.dropFirst(2) + String(format: ": %.6lg", value)
+    }
+  }
+
+  func headingLabel() -> String {
+    guard value >= 0 && value < 360 else {
+      return "-"
+    }
+    let head = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+    let section = 360.0 / Double(head.count)
+    let index = (value + section / 2.0) / section
+    return head[Int(index) % head.count]
   }
 }
 

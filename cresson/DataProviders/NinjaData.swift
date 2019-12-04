@@ -167,8 +167,8 @@ extension NinjaData.Register {
   }
 
   func speedLabel() -> String {
-    let mps = normalizeSpeed()
-    return String(format: "Speed: %.0lfkm/h | %.0lfmph", mps.m2km(), mps.m2mi())
+    let ms = normalizeSpeed()
+    return String(format: "Speed: %.0lfkm/h | %.0lfmph", ms.ms2kmh(), ms.ms2mph())
   }
 
   func mapLabel() -> String {
