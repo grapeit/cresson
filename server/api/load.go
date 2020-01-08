@@ -19,7 +19,7 @@ func init() {
 
 func activeDaysHandler(c *gin.Context) {
 	timezoneOffsetSec := toInt(c.Query("tzos"))
-	query := "SELECT DATE(FROM_UNIXTIME(ts - ?)) d, MIN(ts), MAX(ts), COUNT(ts) FROM data_log WHERE rpm > 0 GROUP BY d"
+	query := "SELECT DATE(FROM_UNIXTIME(ts - ?)) d, MIN(ts), MAX(ts), COUNT(ts) FROM data_log WHERE k_rpm > 0 GROUP BY d"
 	rows, err := database.Query(query, timezoneOffsetSec)
 	if err != nil {
 		logError("activeDaysHandler query error:", err.Error())

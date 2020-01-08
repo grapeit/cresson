@@ -15,7 +15,7 @@
             let timezone_offset_minutes = new Date().getTimezoneOffset();
             let fromTs = 1560574800;
             let toTs = 1560661200;
-            let cols = "speed,battery";
+            let cols = "k_speed,k_battery";
             let dataUrl = "https://cresson-api.the-grape.com/load?tzos=" + timezone_offset_minutes * 60;
             dataUrl += "&from=" + fromTs;
             dataUrl += "&to=" + toTs;
