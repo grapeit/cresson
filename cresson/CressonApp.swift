@@ -2,9 +2,9 @@ import UIKit
 
 class CressonApp {
   var dataCollector: DataCollector!
-  //var timerData: TimerData!
+  var timerData: TimerData!
   var ninjaData: NinjaData!
-  //var locationData: LocationData!
+  var locationData: LocationData!
   var tripMeterData: TripMeterData!
   var logger: Logger!
 
@@ -25,16 +25,15 @@ class CressonApp {
 
   func connect() {
     dataCollector = DataCollector()
-    //timerData = TimerData()
+    timerData = TimerData()
     ninjaData = NinjaData()
-    //locationData = LocationData()
+    locationData = LocationData()
     tripMeterData = TripMeterData()
     logger = Logger()
-    dataCollector.primarySource = ninjaData
-    //dataCollector.addSecondarySource(locationData)
+    dataCollector.primarySource = timerData//ninjaData//
+    dataCollector.addSecondarySource(locationData)
     dataCollector.addCalculatedSource(tripMeterData)
     dataCollector.primarySource.dataCollector = dataCollector
-    dataCollector.primarySource.idleCycle()
     dataCollector.addObserver(logger)
     //NOTE: view controllers register as data observers themselfs
   }

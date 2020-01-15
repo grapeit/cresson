@@ -16,7 +16,25 @@ class DashboardViewController: UIViewController {
     dataView.tableFooterView = UIView(frame: .zero)
     statusLabel.text = ""
     CressonApp.shared.dataCollector.addObserver(self)
-    CressonApp.shared.dataCollector.enumRegisterIds { registerIds.append($0) }
+    registerIds = [
+      "timer",
+      "k_throttle",
+      "k_coolant",
+      "k_rpm",
+      "k_battery",
+      "k_gear",
+      "k_speed",
+      "k_map",
+      //"l_latitude",
+      //"l_longitude",
+      "l_altitude",
+      "l_speed",
+      "l_heading",
+      //"l_hor_accuracy",
+      //"l_vert_accuracy",
+      "l_head_accuracy",
+      "c_trip"
+    ]
   }
 
   private func onConnectionStatusChanged() {
@@ -38,7 +56,7 @@ extension DashboardViewController: UITableViewDelegate {
     if id == tripMeterRegisterId {
       return UISwipeActionsConfiguration(actions: [resetTrip(at: indexPath)])
     }
-    if id == throttleRegisterId && connected {
+    if id == fuelMapRegisterId && connected {
       return UISwipeActionsConfiguration(actions: [switchMap(at: indexPath)])
     }
     return UISwipeActionsConfiguration(actions: [])
@@ -55,13 +73,17 @@ extension DashboardViewController: UITableViewDelegate {
   }
 
   private func switchMap(at indexPath: IndexPath) -> UIContextualAction {
-    let current = CressonApp.shared.dataCollector.getRegister(throttleRegisterId)?.value ?? 0
+    let current = CressonApp.shared.dataCollector.getRegister(fuelMapRegisterId)?.value ?? 0
     let next = current == 1 ? 2 : 1
     return UIContextualAction(style: .normal, title: "\(next)") { (_, _, completion) in
       CressonApp.shared.ninjaData.sendMap(next, withRetry: true)
       self.dataView.reloadRows(at: [indexPath], with: .none)
       completion(true)
     }
+  }
+
+  private func getRegister(_ id: String) -> DataRegister {
+    return CressonApp.shared.dataCollector.getRegister(id) ?? DummyDataRegister(id)
   }
 }
 
@@ -72,8 +94,8 @@ extension DashboardViewController: UITableViewDataSource {
       return cell
     }
     let id = registerIds[indexPath.row]
-    if let cell = cell as? RegisterTableViewCell, let register = CressonApp.shared.dataCollector.getRegister(id) {
-      cell.setRegister(register, connected: connected)
+    if let cell = cell as? RegisterTableViewCell {
+      cell.setRegister(getRegister(id), connected: connected)
     }
     return cell
   }
@@ -89,9 +111,9 @@ extension DashboardViewController: DataObserver {
     statusLabel.text = status.message
   }
 
-  func data(_ data: [DataRegister]) {
+  func data(_ data: [String: DataRegister]) {
     for cell in dataView.visibleCells {
-      if let cell = cell as? RegisterTableViewCell, let id = cell.registerId, let register = CressonApp.shared.dataCollector.getRegister(id) {
+      if let cell = cell as? RegisterTableViewCell, let id = cell.registerId, let register = data[id] {
         cell.setRegister(register, connected: connected)
       }
     }

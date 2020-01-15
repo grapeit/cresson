@@ -1,25 +1,25 @@
 import Foundation
 
 class DataCollector {
-  var primarySource: (PrimaryDataProvider & DataProvider)!
-  private var secondarySources = [DataProvider]()
-  private var calculatedSources = [(DataObserver & DataProvider)]()
+  var primarySource: PrimaryDataProvider!
+  private var secondarySources = [SecondaryDataProvider]()
+  private var calculatedSources = [CalculatedDataProvider]()
   private var observers = [DataObserver]()
   private var currentData = [String: DataRegister]()
 
-  func addSecondarySource(_ source: DataProvider) {
+  func addSecondarySource(_ source: SecondaryDataProvider) {
     secondarySources.append(source)
   }
 
-  func removeSecondarySource(_ source: DataProvider) {
+  func removeSecondarySource(_ source: SecondaryDataProvider) {
     //TODO: remove secondary source
   }
 
-  func addCalculatedSource(_ source: DataObserver & DataProvider) {
+  func addCalculatedSource(_ source: CalculatedDataProvider) {
     calculatedSources.append(source)
   }
 
-  func removeCalculatedSource(_ source: DataObserver & DataProvider) {
+  func removeCalculatedSource(_ source: CalculatedDataProvider) {
     //TODO: remove calculated source
   }
 
@@ -34,56 +34,30 @@ class DataCollector {
   func getRegister(_ id: String) -> DataRegister? {
     return currentData[id]
   }
-}
 
-extension DataCollector: DataProvider {
-  var data: [DataRegister] {
-    return currentData.map { $0.value }
-  }
-
-  func enumRegisterIds(id: (String) -> Void) {
-    primarySource.enumRegisterIds(id: id)
-    for source in secondarySources {
-      source.enumRegisterIds(id: id)
-    }
-    for source in calculatedSources {
-      source.enumRegisterIds(id: id)
-    }
-  }
-}
-
-extension DataCollector: DataObserver {
   func status(_ status: DataProviderStatus) {
-    for source in calculatedSources {
-      source.status(status)
-    }
     for observer in observers {
       observer.status(status)
     }
   }
 
-  func data(_ data: [DataRegister]) {
+  func data(_ primaryData: [DataRegister]) {
     currentData.removeAll()
-    for register in data {
+    for register in primaryData {
       currentData[register.id] = register
     }
     for source in secondarySources {
-      for register in source.data {
+      for register in source.getData() {
         currentData[register.id] = register
       }
     }
-    var registers = currentData.map { $0.value }
-    if !calculatedSources.isEmpty {
-      for source in calculatedSources {
-        source.data(registers)
-        for register in source.data {
-          currentData[register.id] = register
-        }
+    for source in calculatedSources {
+      for register in source.calculate(currentData) {
+        currentData[register.id] = register
       }
-      registers = currentData.map { $0.value }
     }
     for observer in observers {
-      observer.data(registers)
+      observer.data(currentData)
     }
   }
 }

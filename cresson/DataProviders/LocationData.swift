@@ -90,17 +90,11 @@ extension LocationData.Register: DataRegister {
   }
 }
 
-extension LocationData: DataProvider {
-  var data: [DataRegister] {
+extension LocationData: SecondaryDataProvider {
+  func getData() -> [DataRegister] {
     if !locationAvailable {
       return headingRegisters
     }
     return allRegisters
-  }
-
-  func enumRegisterIds(id: (String) -> Void) {
-    for register in allRegisters {
-      id(register.id)
-    }
   }
 }

@@ -114,10 +114,10 @@ extension Logger: DataObserver {
     }
   }
 
-  func data(_ data: [DataRegister]) {
+  func data(_ data: [String: DataRegister]) {
     DispatchQueue.global(qos: .utility).async {
       objc_sync_enter(self)
-      self.writeLog(data)
+      self.writeLog(data.map { $0.value }) //NOTE: is this an excessive transformation?
       objc_sync_exit(self)
     }
   }

@@ -21,17 +21,19 @@ enum DataProviderStatus {
   }
 }
 
-protocol DataProvider {
-  var data: [DataRegister] { get }
-  func enumRegisterIds(id: (String) -> Void)
+protocol PrimaryDataProvider {
+  var dataCollector: DataCollector? { get set }
+}
+
+protocol SecondaryDataProvider {
+  func getData() -> [DataRegister]
+}
+
+protocol CalculatedDataProvider {
+  func calculate(_ data: [String: DataRegister]) -> [DataRegister]
 }
 
 protocol DataObserver: class {
   func status(_ status: DataProviderStatus)
-  func data(_ data: [DataRegister])
-}
-
-protocol PrimaryDataProvider {
-  var dataCollector: DataObserver? { get set }
-  func idleCycle()
+  func data(_ data: [String: DataRegister])
 }

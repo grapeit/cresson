@@ -1,6 +1,6 @@
 import Foundation
 
-class NinjaData {
+class NinjaData: PrimaryDataProvider {
   enum RegisterId: Int, CaseIterable {
     case gear = 11
     case throttle = 4
@@ -46,7 +46,7 @@ class NinjaData {
   private var btConnection = BtConnection()
 
   //PrimaryDataProvider
-  weak var dataCollector: DataObserver?
+  weak var dataCollector: DataCollector?
 
   init() {
     for id in RegisterId.allCases {
@@ -78,25 +78,6 @@ class NinjaData {
     status = data.status == "bike is connected" ? .online(statusString) : .offline(data.status)
     dataCollector?.status(status)
     dataCollector?.data(currentdata.map { $0.value })
-  }
-}
-
-extension NinjaData: PrimaryDataProvider {
-  func idleCycle() {
-    dataCollector?.status(status)
-    dataCollector?.data(self.data)
-  }
-}
-
-extension NinjaData: DataProvider {
-  var data: [DataRegister] {
-    return currentdata.map { $0.value }
-  }
-
-  func enumRegisterIds(id: (String) -> Void) {
-    for i in RegisterId.allCases {
-      id(Register(rId: i, rValue: 0).id)
-    }
   }
 }
 
@@ -190,9 +171,9 @@ extension NinjaData.Register: DataRegister {
     case .gear:
       return "k_gear"
     case .speed:
-      return speedRegisterId
+      return bikeSpeedRegisterId
     case .map:
-      return throttleRegisterId
+      return fuelMapRegisterId
     }
   }
 

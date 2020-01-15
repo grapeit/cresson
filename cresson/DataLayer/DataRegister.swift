@@ -41,12 +41,30 @@ import Foundation
   - c_trip
 */
 
-let throttleRegisterId = "k_map"
-let speedRegisterId = "k_speed"
+let timerRegisterId = "timer"
+let fuelMapRegisterId = "k_map"
+let bikeSpeedRegisterId = "k_speed"
+let locationSpeedRegisterId = "l_speed"
 let tripMeterRegisterId = "c_trip"
 
 protocol DataRegister {
   var id: String { get }
   var value: Double { get }
   var label: String { get }
+}
+
+class DummyDataRegister: DataRegister {
+  var id: String
+
+  init (_ id: String) {
+    self.id = id
+  }
+
+  var value: Double {
+    return 0.0
+  }
+
+  var label: String {
+    return "n/a - [" + id + "]"
+  }
 }

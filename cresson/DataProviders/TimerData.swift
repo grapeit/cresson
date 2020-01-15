@@ -1,6 +1,6 @@
 import Foundation
 
-class TimerData {
+class TimerData: PrimaryDataProvider {
   struct Register: DataRegister {
     let id: String
     var value: Double
@@ -12,7 +12,7 @@ class TimerData {
     }
 
     init() {
-      id = "timer"
+      id = timerRegisterId
       value = Date().timeIntervalSinceReferenceDate
     }
   }
@@ -23,7 +23,7 @@ class TimerData {
   private var timer: Timer!
 
   //PrimaryDataProvider
-  weak var dataCollector: DataObserver?
+  weak var dataCollector: DataCollector?
 
   init() {
     timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { [weak self] _ in self?.advance() }
@@ -31,23 +31,7 @@ class TimerData {
 
   func advance() {
     time.value = Date().timeIntervalSinceReferenceDate
-    idleCycle()
-  }
-}
-
-extension TimerData: PrimaryDataProvider {
-  func idleCycle() {
     dataCollector?.status(DataProviderStatus.online(""))
-    dataCollector?.data(self.data)
-  }
-}
-
-extension TimerData: DataProvider {
-  var data: [DataRegister] {
-    return [time]
-  }
-
-  func enumRegisterIds(id: (String) -> Void) {
-    id(time.id)
+    dataCollector?.data([time])
   }
 }
