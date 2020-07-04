@@ -31,8 +31,7 @@ class NinjaData: PrimaryDataProvider {
 
     let status: String
     let registers: [Register]
-    let map: Int
-    let lastError: Int
+    let map: Int?
     let time: TimeInterval
   }
 
@@ -70,7 +69,9 @@ class NinjaData: PrimaryDataProvider {
       }
       currentdata[id] = Register(rId: id, rValue: register.value)
     }
-    currentdata[.map] = Register(rId: .map, rValue: data.map)
+    if let map = data.map {
+      currentdata[.map] = Register(rId: .map, rValue: map)
+    }
     if let mapToSend = mapToSend, mapToSend != data.map {
       sendMap(mapToSend, withRetry: false)
     }

@@ -20,14 +20,15 @@ import Foundation
 
 /*
  Registers ids
- - Motorcycle data (K-line + power commander map switch)
+ - Motorcycle data (K-line)
   - k_throttle
   - k_coolant
   - k_rpm
   - k_battery
   - k_gear
   - k_speed
-  - k_map
+ - Power commander map switch
+  - s_map
  - Location data
   - l_latitude
   - l_longitude
@@ -42,7 +43,7 @@ import Foundation
 */
 
 let timerRegisterId = "timer"
-let fuelMapRegisterId = "k_map"
+let fuelMapRegisterId = "s_map"
 let bikeSpeedRegisterId = "k_speed"
 let locationSpeedRegisterId = "l_speed"
 let tripMeterRegisterId = "c_trip"
@@ -65,6 +66,6 @@ class DummyDataRegister: DataRegister {
   }
 
   var label: String {
-    return "n/a - [" + id + "]"
+    return "[" + id + "]"
   }
 }

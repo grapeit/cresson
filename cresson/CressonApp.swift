@@ -30,7 +30,7 @@ class CressonApp {
     locationData = LocationData()
     tripMeterData = TripMeterData()
     logger = Logger()
-    dataCollector.primarySource = timerData//ninjaData//
+    dataCollector.primarySource = ninjaData//timerData//
     dataCollector.addSecondarySource(locationData)
     dataCollector.addCalculatedSource(tripMeterData)
     dataCollector.primarySource.dataCollector = dataCollector

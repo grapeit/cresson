@@ -17,18 +17,17 @@ class DashboardViewController: UIViewController {
     statusLabel.text = ""
     CressonApp.shared.dataCollector.addObserver(self)
     registerIds = [
-      "timer",
+      //"timer",
+      "k_gear",
+      "k_rpm",
+      "k_speed",
       "k_throttle",
       "k_coolant",
-      "k_rpm",
       "k_battery",
-      "k_gear",
-      "k_speed",
-      "k_map",
       //"l_latitude",
       //"l_longitude",
-      "l_altitude",
       "l_speed",
+      "l_altitude",
       "l_heading",
       //"l_hor_accuracy",
       //"l_vert_accuracy",
