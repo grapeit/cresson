@@ -1,12 +1,13 @@
 #include <SoftwareSerial.h>
-#include "FuelMap.h"
 #include "kawa.h"
-#include "led.h"
+//#include "FuelMap.h"
+//#include "Activator.h"
+//#include "led.h"
  
 SoftwareSerial bt(12, 13); // RX, TX
-FuelMap fuelMap(10, 0); // Pin, EEPROM address
+//FuelMap fuelMap(6, 4); // pin, EEPROM address
+//Activator garageDoor("door", 7, 3333); // command, pin, duration
 Kawa kawa; // uses Serial so do not use it anywhere else (pins 0 and 1)
-RgbLed led(4, 2, 3);
 
 struct Register
 {
@@ -18,14 +19,11 @@ struct Register
 char currentStatus[32] { };
 Register registers[] = {
     {4},  // Throttle Position Sensor 0x00D2 - 0x037A (depends on kill switch)
-//    {5},  // Air Pressure
     {6},  // Engine Coolant Temperature (C) = (a - 48) / 1.6
-//    {7},  // Intake Air Temperature
-//    {8},  // ?
     {9},  // Engine RPM = (a * 100) + b
     {10}, // Battery (V) = a / 12.75
     {11}, // Gear Position = a (always 0 or 6 when not running)
-    {12}  // Speed (km/h) = ((a * 100) + b) / 2
+    {12}, // Speed (km/h) = ((a * 100) + b) / 2
 };
 
 unsigned long cycle;
@@ -44,12 +42,13 @@ bool shouldRequest(uint8_t id) {
 
 unsigned long reportTime;
 char sz[256];
-
+  
 void setup() {
-  bt.begin(9600);
-  fuelMap.setup();
+  bt.begin(57600);
+  //fuelMap.setup();
+  //garageDoor.setup();
   reportTime = millis();
-  led.set(RgbLed::white);
+  sendData();
 }
 
 void loop() {
@@ -60,19 +59,20 @@ void loop() {
   if (kawa.getLastError() == 0) {
     requestRegisters();
   } else {
-    led.set(RgbLed::red);
     delay(1000);
   }
 }
 
 void processInput() {
   while (bt.available()) {
-    fuelMap.input(bt.read());
+    char i = bt.read();
+    //fuelMap.input(i);
+    //garageDoor.input(i);
   }
+  //garageDoor.tick();
 }
 
 void connectToBike() {
-  led.set(RgbLed::yellow);
   strcpy(currentStatus, "connecting to bike");
   sendData();
   delay(1000);
@@ -86,7 +86,6 @@ void connectToBike() {
 }
 
 void requestRegisters() {
-  led.set(RgbLed::green);
   uint8_t response[sizeof (Register::value)];
   ++cycle;
   for (auto& r : registers) {
@@ -106,8 +105,7 @@ void requestRegisters() {
 }
 
 void sendData() {
-  processInput(); // check for input that may come during negotiation with bike
-  led.set(RgbLed::blue);
+  //processInput(); // check for input that may come during negotiation with bike
   //NOTE: sending payload to `bt` in pieces will allow to decrease size of `sz` buffer 
   int s = sprintf(sz, "{\"status\":\"%s\",\"registers\":[", currentStatus);
   if (kawa.getLastError() == 0) {
@@ -122,12 +120,10 @@ void sendData() {
     }
   }
   sz[s++] = ']';
-  s += sprintf(sz + s, ",\"map\":%d", fuelMap.get());
-  s += sprintf(sz + s, ",\"lastError\":%d", kawa.getLastError());
+  //s += sprintf(sz + s, ",\"map\":%d", fuelMap.get());
   s += sprintf(sz + s, ",\"time\":%ld", millis() - reportTime);
   sz[s++] = '}';
   sz[s] = 0;
-  led.set(RgbLed::purple);
   bt.println(sz);
   reportTime = millis();
 }

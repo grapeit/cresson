@@ -1,10 +1,10 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial target(12, 13); // RX, TX
+SoftwareSerial target(12, 13); // TX, RX
 
 void setup() {
   Serial.begin(9600);
-  target.begin(9600);
+  target.begin(57600);
   Serial.println("Hello");
 }
 

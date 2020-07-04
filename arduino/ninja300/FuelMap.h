@@ -10,7 +10,7 @@ class FuelMap {
 
 public:
   FuelMap(char pin, int address) : _pin(pin), _address(address) {
-  
+
   }
 
   void setup() {
@@ -29,11 +29,13 @@ public:
       _commandIndex = 0;
       set();
       save();
-    } else if (fuelMapCommand[_commandIndex] == i) {
-      ++_commandIndex;
-    } else {
-      _commandIndex = 0;
+      return;
     }
+    if (fuelMapCommand[_commandIndex] != i) {
+      _commandIndex = 0;
+      return;
+    }
+    ++_commandIndex;
   }
 
 private:

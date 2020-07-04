@@ -1,6 +1,7 @@
 to change bluetooth device name connect it to Arduino board
 RX to pin 13, TX to pin 12
 make sure bluetooth board is not currently connected (paired)
+correct bloutooth module baud rate if needed (line `target.begin(...);`)
 upload `serial-echo` project to Arduino
 open `Serial Monitor` tool and set options to `Both NL & CR` and `9600 baud`
 to check connection send `AT` - it should response with `OK`
