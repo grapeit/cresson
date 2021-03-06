@@ -44,7 +44,7 @@ unsigned long reportTime;
 char sz[256];
   
 void setup() {
-  bt.begin(57600);
+  bt.begin(9600);
   //fuelMap.setup();
   //garageDoor.setup();
   reportTime = millis();

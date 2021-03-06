@@ -8,3 +8,9 @@ to check connection send `AT` - it should response with `OK`
 to check current name send `AT+NAME`
 to set new name send `AT+NAMEcresson`
 to apply change send `AT+RESET`
+
+AT+BAUD
+4 = 9600
+5 = 19200
+6 = 38400
+7 = 57600
