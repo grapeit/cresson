@@ -2,7 +2,7 @@ FROM golang as builder
 
 WORKDIR /
 COPY * /
-RUN go build -a -v -o cresson
+RUN CGO_ENABLED=0 go build -a -v -o cresson
 
 
 FROM scratch
