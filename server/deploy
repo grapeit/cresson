@@ -1,3 +1,6 @@
+cd web
+npm run build || exit 1
+cd ..
 docker network create cresson-network
 docker volume create cresson-db-vol
 docker-compose build
