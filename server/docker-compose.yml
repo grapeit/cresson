@@ -16,7 +16,7 @@ services:
       - CRESSON_API_DB_DRIVER
       - CRESSON_API_DB_CONNECT
       - CRESSON_API_DEBUG
-    restart: on-failure
+    restart: always
     mem_limit: 500M
 
   db:
@@ -30,7 +30,7 @@ services:
     volumes:
       - cresson-db-vol:/var/lib/mysql
       - ./db/db.sql:/docker-entrypoint-initdb.d/db.sql
-    restart: on-failure
+    restart: always
     mem_limit: 1G
 
   web-ui:
@@ -42,7 +42,7 @@ services:
       - cresson-network
     ports:
       - "2401:80/tcp"
-    restart: on-failure
+    restart: always
     mem_limit: 500M
 
 volumes:

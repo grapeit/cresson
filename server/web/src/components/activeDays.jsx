@@ -12,7 +12,9 @@ class ActiveDays extends Component {
     return (
       <React.Fragment>
         {this.state.days.map((day) => (
-          <button>{day.date + " (" + day.records + ")"}</button>
+          <button key={day.date} onClick={() => this.props.onChooseDay(day)}>
+            {day.date + " (" + day.records + ")"}
+          </button>
         ))}
       </React.Fragment>
     );
